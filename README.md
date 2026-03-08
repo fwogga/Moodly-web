@@ -100,7 +100,7 @@ Requisitos de Alto Nível
 
 ## Requisitos Funcionais
 
-Estes requisitos descrevem as funcionalidades que a aplicação deve obrigatoriamente oferecer:  
+Estes requisitos descrevem as funcionalidades que o website deve obrigatoriamente oferecer:  
 
 - **Swipe de Perfis**: o utilizador deve poder visualizar perfis de outros estudantes e indicar interesse em conectar-se ou não.  
 - **Gestão de Conexões (Matches)**: sempre que dois utilizadores mostrem interesse mútuo, deve ser criada uma conexão visível na aba de Conexões.  
@@ -113,7 +113,7 @@ Estes requisitos descrevem as funcionalidades que a aplicação deve obrigatoria
 - **Mapa de Eventos**: cada usuario poderá ver os evenbtos da qual ele participa por meio de um mapa.
 
 ## Requisitos não funcionais
-Estes requisitos garantem a qualidade, segurança e usabilidade da aplicação:  
+Estes requisitos garantem a qualidade e usabilidade do website:  
 
 - **Definições**: o website deve ter algumas definições de perfil basicas 
 - **Interface Intuitiva e Amigável**: o design vai ser simples, moderno e adaptado ao público, facilitando a navegação.  
