@@ -5,7 +5,7 @@
 - Miguel Almeida (20240206)
 - Vivandro Kambanza (20241805)
 
-Moodly será uma expansão do nosso projeto do semestre anterior com o mesmo nome. Será um website criado para ajudar calouros universitários a integrarem-se mais facilmente na vida académica. A ideia surge da facto de que muitos estudantes do primeiro ano têm dificuldade em encontrar novos amigos e criar amizades até mesmo dentro do seu curso. O website funciona de forma semelhante a serviços como tinder, ou o Bumble, que popularizaram o conceito de “swipe” mas em vez de procurar relações românticas, o objetivo é encontrar pessoas com interesses em comum, como música, filmes ou jogos.
+Moodly será uma expansão do nosso projeto do semestre anterior com o mesmo nome. Será um website criado para ajudar calouros universitários a integrarem-se mais facilmente na vida académica. A ideia surge do facto de que muitos estudantes do primeiro ano têm dificuldade em encontrar novos amigos e criar amizades até mesmo dentro do seu curso. O website funciona de forma semelhante a serviços como tinder, ou o Bumble, que popularizaram o conceito de “swipe” mas em vez de procurar relações românticas, o objetivo é encontrar pessoas com interesses em comum, como música, filmes ou jogos.
 
 ## Objetivos do Projeto
 -	Criar um website funcional que promova conexões sociais autênticas
