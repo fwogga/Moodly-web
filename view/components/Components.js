@@ -20,7 +20,7 @@ const Components = {
       { id: 'profile', icon: 'profile', label: 'Perfil'    },
     ];
     const nome       = Model.user?.nome || 'Utilizador';
-    const totalUnread = Model.getTotalUnread();
+    const totalUnread = Model.getTotalUnread(); 
 
     return `
       <aside class="sidebar">

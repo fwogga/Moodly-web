@@ -13,7 +13,7 @@
   overflow: hidden;
 }
 
-.auth-bg-orb {
+.auth-background-mid{
   position: absolute;
   border-radius: 50%;
   filter: blur(90px);
@@ -34,7 +34,6 @@
 }
 
 .auth-left {
-  background: linear-gradient(135deg, var(--purple-dim) 0%, var(--bg-deep) 100%);
   padding: 48px 40px;
   display: flex;
   flex-direction: column;
@@ -47,7 +46,7 @@
   position: absolute;
   width: 300px; height: 300px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 214, 0, 0.15) 0%, transparent 70%);
+  
   top: -80px; right: -80px;
 }
 

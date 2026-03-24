@@ -6,7 +6,7 @@ const EventsPage = {
     return Components.shell(`
       <div class="page-header anim">
         <div class="page-header-left">
-          <h1>Evento</h1>
+          <h1>Ok</h1>
           <p>Participa em eventos com pessoas como tu</p>
         </div>
         <button class="btn btn-primary" onclick="Controller.createEvent()">

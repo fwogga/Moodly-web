@@ -20,9 +20,7 @@ const Renderer = {
   // Páginas sem sidebar (ecrã inteiro)
   FULLSCREEN_PAGES: new Set(['login', 'signup', 'interests']),
 
-  /**
-   * Render principal — chamado sempre que o estado muda.
-   */
+  /* Render principal — chamado sempre que o estado muda.*/
   render() {
     const appEl  = document.getElementById('app');
     const page   = Model.currentPage;
@@ -36,9 +34,7 @@ const Renderer = {
     }
   },
 
-  /**
-   * Toast de notificação temporária.
-   */
+  /*Toast de notificação temporária.*/
   toast(message, type = 'info') {
     const ICONS = { success: Icons.check, error: Icons.x, info: Icons.star };
     const el = document.createElement('div');
@@ -52,9 +48,7 @@ const Renderer = {
     }, 3200);
   },
 
-  /**
-   * Modal de confirmação genérico.
-   */
+  /* Modal de confirmação genérico.*/
   modal(title, body, buttons) {
     const overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
