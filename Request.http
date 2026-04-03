@@ -1,0 +1,453 @@
+@base = http://localhost:8000
+
+##################################################
+### 1. CREATE USERS
+##################################################
+
+###
+POST {{base}}/api/register
+Content-Type: application/json
+
+{ "name": "Angelo", "email": "angelo@test.com", "password": "123456" }
+
+###
+POST {{base}}/api/register
+Content-Type: application/json
+
+{ "name": "Maria", "email": "maria@test.com", "password": "123456" }
+
+###
+POST {{base}}/api/register
+Content-Type: application/json
+
+{ "name": "Joao", "email": "joao@test.com", "password": "123456" }
+
+### [ERROR CASE] Duplicate email
+POST {{base}}/api/register
+Content-Type: application/json
+
+{ "name": "Angelo2", "email": "angelo@test.com", "password": "123456" }
+
+### [ERROR CASE] Missing fields
+POST {{base}}/api/register
+Content-Type: application/json
+
+{ "name": "NoEmail" }
+
+##################################################
+### 2. LOGIN
+##################################################
+
+###
+POST {{base}}/api/login
+Content-Type: application/json
+
+{ "email": "angelo@test.com", "password": "123456" }
+
+###
+POST {{base}}/api/login
+Content-Type: application/json
+
+{ "email": "maria@test.com", "password": "123456" }
+
+###
+POST {{base}}/api/login
+Content-Type: application/json
+
+{ "email": "joao@test.com", "password": "123456" }
+
+### [ERROR CASE] Wrong password
+POST {{base}}/api/login
+Content-Type: application/json
+
+{ "email": "angelo@test.com", "password": "wrongpass" }
+
+##################################################
+### 3. INTEREST SYSTEM
+### Category names must match the DB exactly:
+###   "Música" | "Jogos" | "Cinema & Séries"
+##################################################
+
+###
+POST {{base}}/api/interests/set?userId=1
+Content-Type: application/json
+
+{
+  "tags": [
+    { "name": "Rock",            "category": "Música" },
+    { "name": "Ficção Científica","category": "Cinema & Séries" }
+  ]
+}
+
+###
+POST {{base}}/api/interests/set?userId=2
+Content-Type: application/json
+
+{
+  "tags": [
+    { "name": "Rock", "category": "Música" },
+    { "name": "RPG",  "category": "Jogos" }
+  ]
+}
+
+###
+POST {{base}}/api/interests/set?userId=3
+Content-Type: application/json
+
+{
+  "tags": [
+    { "name": "Drama", "category": "Cinema & Séries" }
+  ]
+}
+
+### Get all interest categories and their tags
+GET {{base}}/api/interests
+
+### Search tags by prefix (autocomplete)
+GET {{base}}/api/interests/search?q=Ro
+
+### [ERROR CASE] Invalid category
+POST {{base}}/api/interests/set?userId=1
+Content-Type: application/json
+
+{
+  "tags": [
+    { "name": "Surf", "category": "Desporto" }
+  ]
+}
+
+##################################################
+### 4. CONNECTION SYSTEM
+##################################################
+
+### Angelo sends request to Maria
+POST {{base}}/api/connections/request?userId=1
+Content-Type: application/json
+
+{ "targetId": 2 }
+
+### Maria accepts
+POST {{base}}/api/connections/accept?userId=2
+Content-Type: application/json
+
+{ "requestId": 1 }
+
+### Check Angelo's connections (should show Maria + pending list)
+GET {{base}}/api/connections?userId=1
+
+### Joao sends request to Angelo
+POST {{base}}/api/connections/request?userId=3
+Content-Type: application/json
+
+{ "targetId": 1 }
+
+### Angelo rejects Joao
+POST {{base}}/api/connections/reject?userId=1
+Content-Type: application/json
+
+{ "requestId": 2 }
+
+### Check Joao's connections (should be empty)
+GET {{base}}/api/connections?userId=3
+
+### [ERROR CASE] Duplicate request
+POST {{base}}/api/connections/request?userId=1
+Content-Type: application/json
+
+{ "targetId": 2 }
+
+### [ERROR CASE] Self-request
+POST {{base}}/api/connections/request?userId=1
+Content-Type: application/json
+
+{ "targetId": 1 }
+
+##################################################
+### 5. DISCOVERY
+##################################################
+
+### Angelo discovers users (Maria should score high — shared "Rock" tag)
+GET {{base}}/api/users/discover?userId=1
+
+### Joao discovers users
+GET {{base}}/api/users/discover?userId=3
+
+##################################################
+### 6. USER SEARCH
+##################################################
+
+### Search by partial name
+GET {{base}}/api/users/search?q=ma&userId=1
+
+### Search returns nothing
+GET {{base}}/api/users/search?q=zzz&userId=1
+
+##################################################
+### 7. USER PROFILES
+##################################################
+
+### Get own profile (Angelo)
+GET {{base}}/api/users/profile?userId=1
+
+### Get Maria's profile from Angelo's session
+GET {{base}}/api/users/profile?userId=1&targetUserId=2
+
+##################################################
+### 8. EVENTS
+##################################################
+
+### Create event (no invitees at creation)
+POST {{base}}/api/events/create?userId=1
+Content-Type: application/json
+
+{
+  "title": "Rock Night",
+  "description": "Live rock concert in Lisbon",
+  "location": "Lisbon",
+  "lat": 38.72,
+  "lng": -9.13,
+  "date": "2026-06-15 21:00:00"
+}
+
+### Invite Maria after creation (Angelo is creator, Maria is a connection)
+POST {{base}}/api/events/invite?userId=1
+Content-Type: application/json
+
+{
+  "eventId": 1,
+  "userId": 2
+}
+
+### [ERROR CASE] Invite Joao — not a connection of Angelo
+POST {{base}}/api/events/invite?userId=1
+Content-Type: application/json
+
+{
+  "eventId": 1,
+  "userId": 3
+}
+
+### [ERROR CASE] Non-creator tries to invite
+POST {{base}}/api/events/invite?userId=2
+Content-Type: application/json
+
+{
+  "eventId": 1,
+  "userId": 3
+}
+
+### Maria accepts the invite
+POST {{base}}/api/events/accept?userId=2
+Content-Type: application/json
+
+{ "eventId": 1 }
+
+### Get Angelo's events (should show Rock Night as confirmed)
+GET {{base}}/api/events?userId=1
+
+### Get Maria's events (should show Rock Night as confirmed)
+GET {{base}}/api/events?userId=2
+
+### Event detail view
+GET {{base}}/api/events/detail?eventId=1&userId=1
+
+### Map events (Angelo)
+GET {{base}}/api/events/map?userId=1
+
+### Maria leaves the event
+POST {{base}}/api/events/leave?userId=2
+Content-Type: application/json
+
+{ "eventId": 1 }
+
+### [ERROR CASE] Creator tries to leave (must use cancel)
+POST {{base}}/api/events/leave?userId=1
+Content-Type: application/json
+
+{ "eventId": 1 }
+
+### Create a second event with invitees at creation time
+POST {{base}}/api/events/create?userId=1
+Content-Type: application/json
+
+{
+  "title": "Game Night",
+  "description": "Board games and fun",
+  "location": "Porto",
+  "lat": 41.15,
+  "lng": -8.61,
+  "date": "2026-07-01 19:00:00",
+  "invitees": [2]
+}
+
+### Angelo cancels Rock Night
+POST {{base}}/api/events/cancel?userId=1
+Content-Type: application/json
+
+{ "eventId": 1 }
+
+### [ERROR CASE] Non-creator tries to cancel
+POST {{base}}/api/events/cancel?userId=2
+Content-Type: application/json
+
+{ "eventId": 2 }
+
+### Angelo deletes the cancelled Rock Night
+POST {{base}}/api/events/delete?userId=1
+Content-Type: application/json
+
+{ "eventId": 1 }
+
+### [ERROR CASE] Delete a non-cancelled event
+POST {{base}}/api/events/delete?userId=1
+Content-Type: application/json
+
+{ "eventId": 2 }
+
+##################################################
+### 9. CHAT (DIRECT / INDIVIDUAL)
+##################################################
+
+### List all chats for Angelo
+GET {{base}}/api/chat?userId=1
+
+### Angelo sends a message to Maria (connectionId = 1)
+POST {{base}}/api/chat/send?userId=1
+Content-Type: application/json
+
+{
+  "connectionId": 1,
+  "message": "Hey Maria, ready for the concert?"
+}
+
+### Maria replies
+POST {{base}}/api/chat/send?userId=2
+Content-Type: application/json
+
+{
+  "connectionId": 1,
+  "message": "Absolutely! See you there!"
+}
+
+### Get messages for that connection
+GET {{base}}/api/chat/messages?connectionId=1&userId=1
+
+### [ERROR CASE] Get messages for a connection you're not part of
+GET {{base}}/api/chat/messages?connectionId=1&userId=3
+
+### [ERROR CASE] Empty message
+POST {{base}}/api/chat/send?userId=1
+Content-Type: application/json
+
+{
+  "connectionId": 1,
+  "message": ""
+}
+
+##################################################
+### 10. EVENT GROUP CHAT
+##################################################
+
+### Angelo sends a message to the Game Night group chat (eventId = 2)
+POST {{base}}/api/chat/event/send?userId=1
+Content-Type: application/json
+
+{
+  "eventId": 1,
+  "message": "Looking forward to game night!"
+}
+
+### Get all group chat messages for Game Night
+GET {{base}}/api/chat/event/messages?eventId=1&userId=1
+
+### [ERROR CASE] Non-participant tries to post
+POST {{base}}/api/chat/event/send?userId=3
+Content-Type: application/json
+
+{
+  "eventId": 2,
+  "message": "Can I join?"
+}
+
+##################################################
+### 11. REPORT SYSTEM
+##################################################
+
+### Angelo reports Joao
+POST {{base}}/api/report?userId=1
+Content-Type: application/json
+
+{
+  "reportedId": 3,
+  "reason": "Spam and inappropriate messages"
+}
+
+### [ERROR CASE] Duplicate report (same reporter + reported, still pending)
+POST {{base}}/api/report?userId=1
+Content-Type: application/json
+
+{
+  "reportedId": 3,
+  "reason": "Again"
+}
+
+### [ERROR CASE] Report yourself
+POST {{base}}/api/report?userId=1
+Content-Type: application/json
+
+{
+  "reportedId": 1,
+  "reason": "Testing self-report"
+}
+
+##################################################
+### 12. ADMIN
+##################################################
+
+### Get all users (admin only — Angelo must have role='admin' in DB)
+GET {{base}}/api/admin/users?userId=1
+
+### Get platform statistics
+GET {{base}}/api/admin/stats?userId=1
+
+### Get all reports
+GET {{base}}/api/admin/reports?userId=1
+
+### Ban Joao 
+POST {{base}}/api/admin/ban?userId=1
+Content-Type: application/json
+
+{ "userId": 3 }
+
+### Verify banned user cannot login
+POST {{base}}/api/login
+Content-Type: application/json
+
+{ "email": "joao@test.com", "password": "123456" }
+
+### Unban Joao
+POST {{base}}/api/admin/unban?userId=1
+Content-Type: application/json
+
+{ "userId": 3 }
+
+### Verify Joao can login again
+POST {{base}}/api/login
+Content-Type: application/json
+
+{ "email": "joao@test.com", "password": "123456" }
+
+### Mark report as reviewed
+POST {{base}}/api/admin/reports/resolve?userId=1
+Content-Type: application/json
+
+{ "reportId": 1, "status": "reviewed" }
+
+### Dismiss a report
+POST {{base}}/api/admin/reports/resolve?userId=1
+Content-Type: application/json
+
+{ "reportId": 1, "status": "dismissed" }
+
+### [ERROR CASE] Non-admin tries to access admin route
+GET {{base}}/api/admin/users?userId=2
