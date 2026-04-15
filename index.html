@@ -4,45 +4,23 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Moodly</title>
-
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet"/>
-
-  <!-- CSS -->
-  <link rel="stylesheet" href="css/variables.css"/>
-  <link rel="stylesheet" href="css/base.css"/>
-  <link rel="stylesheet" href="css/components.css"/>
-  <link rel="stylesheet" href="css/layout.css"/>
-  <link rel="stylesheet" href="css/pages.css"/>
-  <link rel="stylesheet" href="css/animations.css"/>
+  <link rel="stylesheet" href="css/app.css"/>
 </head>
 <body>
-
-  <!-- Ponto de montagem da aplicação -->
   <div id="app"></div>
 
-  <!-- ── MODEL ── -->
-  <script src="model/Model.js"></script>
+  <script src="js/components/Icons.js"></script>
+  <script src="js/components/Components.js"></script>
+  <script src="js/App.js"></script>
+  <script src="js/pages/AuthPages.js"></script>
+  <script src="js/pages/HomePage.js"></script>
+  <script src="js/pages/EventsPage.js"></script>
+  <script src="js/pages/ChatsPage.js"></script>
+  <script src="js/pages/ProfilePage.js"></script>
+  <script src="js/pages/AdminPage.js"></script>
 
-  <!-- ── VIEW ── -->
-  <script src="view/components/Icons.js"></script>
-  <script src="view/components/Components.js"></script>
-  <script src="view/pages/AuthPages.js"></script>
-  <script src="view/pages/HomePages.js"></script>
-  <script src="view/pages/EventsPage.js"></script>
-  <script src="view/pages/ChatsPage.js"></script>
-  <script src="view/pages/ProfilePages.js"></script>
-  <script src="view/Renderer.js"></script>
-
-  <!-- ── CONTROLLER ── -->
-  <script src="controller/Controller.js"></script>
-
-  <!-- ── BOOT ── -->
   <script>
-    document.addEventListener('DOMContentLoaded', () => Renderer.init());
+    document.addEventListener('DOMContentLoaded', () => App.init());
   </script>
-
 </body>
 </html>
