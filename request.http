@@ -1,0 +1,278 @@
+@base = http://localhost:8000
+
+####################
+### auth
+####################
+
+###
+POST {{base}}/api/api.php?action=register
+Content-Type: application/x-www-form-urlencoded
+
+name=Angelo&email=angelo@test.com&password=123456
+
+###
+POST {{base}}/api/api.php?action=register
+Content-Type: application/x-www-form-urlencoded
+
+name=Maria&email=maria@test.com&password=123456
+
+###
+POST {{base}}/api/api.php?action=register
+Content-Type: application/x-www-form-urlencoded
+
+name=Joao&email=joao@test.com&password=123456
+
+###
+POST {{base}}/api/api.php?action=login
+Content-Type: application/x-www-form-urlencoded
+
+email=angelo@test.com&password=123456
+
+###
+POST {{base}}/api/api.php?action=login
+Content-Type: application/x-www-form-urlencoded
+
+email=maria@test.com&password=123456
+
+###
+POST {{base}}/api/api.php?action=login
+Content-Type: application/x-www-form-urlencoded
+
+email=joao@test.com&password=123456
+
+###
+POST {{base}}/api/api.php?action=logout
+
+###
+GET {{base}}/api/api.php?action=check_session
+
+################
+### interesses
+###############
+
+###
+GET {{base}}/api/api.php?action=get_interests
+
+###
+GET {{base}}/api/api.php?action=search_interests&q=Ro
+
+###
+GET {{base}}/api/api.php?action=search_interests&q=Rock&categoria=Música
+
+###
+POST {{base}}/api/api.php?action=find_or_create_interest
+Content-Type: application/x-www-form-urlencoded
+
+userId=2&name=Punk&categoria=Música
+
+###
+POST {{base}}/api/api.php?action=set_interests
+Content-Type: application/x-www-form-urlencoded
+
+userId=2&tags=[1,11,21]
+
+###
+POST {{base}}/api/api.php?action=set_interests
+Content-Type: application/x-www-form-urlencoded
+
+userId=3&tags=[1,11]
+
+###
+POST {{base}}/api/api.php?action=set_interests
+Content-Type: application/x-www-form-urlencoded
+
+userId=4&tags=[24]
+
+##############
+### conexões
+#############
+
+###
+POST {{base}}/api/api.php?action=send_request
+Content-Type: application/x-www-form-urlencoded
+
+userId=2&targetId=3
+
+###
+POST {{base}}/api/api.php?action=accept_request
+Content-Type: application/x-www-form-urlencoded
+
+userId=3&requestId=1
+
+###
+GET {{base}}/api/api.php?action=get_connections&userId=2
+
+###
+POST {{base}}/api/api.php?action=send_request
+Content-Type: application/x-www-form-urlencoded
+
+userId=4&targetId=2
+
+###
+POST {{base}}/api/api.php?action=reject_request
+Content-Type: application/x-www-form-urlencoded
+
+userId=2&requestId=2
+
+###
+GET {{base}}/api/api.php?action=get_connections&userId=4
+
+##############
+### descobrir
+##############
+
+###
+GET {{base}}/api/api.php?action=discover&userId=2
+
+###
+GET {{base}}/api/api.php?action=discover&userId=4
+
+#############
+### procura
+###########
+
+###
+GET {{base}}/api/api.php?action=search_users&userId=2&q=ma
+
+###
+GET {{base}}/api/api.php?action=search_users&userId=2&q=jo
+
+###########
+### perfil
+###########
+
+###
+GET {{base}}/api/api.php?action=get_profile&userId=2
+
+###
+GET {{base}}/api/api.php?action=get_profile&userId=2&targetId=3
+
+###
+POST {{base}}/api/api.php?action=update_profile
+Content-Type: application/x-www-form-urlencoded
+
+userId=2&name=Angelo Updated
+
+############
+### eventos
+############
+
+###
+GET {{base}}/api/api.php?action=get_events&userId=2
+
+###
+POST {{base}}/api/api.php?action=create_event
+Content-Type: application/x-www-form-urlencoded
+
+userId=2&title=Rock Night&description=Live music&location=Lisboa&lat=38.72&lng=-9.13&date=2026-06-15 21:00:00
+
+###
+POST {{base}}/api/api.php?action=invite_to_event
+Content-Type: application/x-www-form-urlencoded
+
+userId=2&eventId=1&inviteeId=3
+
+###
+POST {{base}}/api/api.php?action=accept_event
+Content-Type: application/x-www-form-urlencoded
+
+userId=3&eventId=1
+
+###
+POST {{base}}/api/api.php?action=decline_event
+Content-Type: application/x-www-form-urlencoded
+
+userId=3&eventId=1
+
+###
+POST {{base}}/api/api.php?action=cancel_event
+Content-Type: application/x-www-form-urlencoded
+
+userId=2&eventId=1
+
+###
+POST {{base}}/api/api.php?action=delete_event
+Content-Type: application/x-www-form-urlencoded
+
+userId=2&eventId=1
+
+###
+GET {{base}}/api/api.php?action=get_map_events&userId=2
+
+#########
+### chat
+########
+
+###
+GET {{base}}/api/api.php?action=get_chats&userId=2
+
+###
+GET {{base}}/api/api.php?action=get_messages&userId=2&connectionId=1
+
+###
+POST {{base}}/api/api.php?action=send_message
+Content-Type: application/x-www-form-urlencoded
+
+userId=2&connectionId=1&message=Hey, como estás?
+
+###
+POST {{base}}/api/api.php?action=send_message
+Content-Type: application/x-www-form-urlencoded
+
+userId=3&connectionId=1&message=Tudo bem e tu?
+
+###
+GET {{base}}/api/api.php?action=get_event_messages&userId=2&eventId=1
+
+###
+POST {{base}}/api/api.php?action=send_event_message
+Content-Type: application/x-www-form-urlencoded
+
+userId=2&eventId=1&message=Alguém vai ao evento?
+
+###########
+### reports
+###########
+
+###
+POST {{base}}/api/api.php?action=report_user
+Content-Type: application/x-www-form-urlencoded
+
+userId=2&reportedId=4&reason=Comportamento inadequado
+
+#########
+### admin
+#########
+
+###
+POST {{base}}/api/api.php?action=make_admin
+Content-Type: application/x-www-form-urlencoded
+
+targetId=1
+
+###
+GET {{base}}/api/api.php?action=admin_get_users&userId=1
+
+###
+GET {{base}}/api/api.php?action=admin_stats&userId=1
+
+###
+GET {{base}}/api/api.php?action=admin_get_reports&userId=1
+
+###
+POST {{base}}/api/api.php?action=admin_ban
+Content-Type: application/x-www-form-urlencoded
+
+userId=1&targetId=4&banned=1
+
+###
+POST {{base}}/api/api.php?action=admin_ban
+Content-Type: application/x-www-form-urlencoded
+
+userId=1&targetId=4&banned=0
+
+###
+POST {{base}}/api/api.php?action=admin_resolve_report
+Content-Type: application/x-www-form-urlencoded
+
+userId=1&reportId=1&status=reviewed
