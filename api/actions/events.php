@@ -1,68 +1,125 @@
 <?php
 
-if ($action === 'get_connections') {
+if ($action === 'get_events') {
     $userId = requireLogin();
     $db = db();
-
     $st = $db->prepare("
-        SELECT pc.pedcon_id AS connection_id, other.usuar_id, other.usuar_nome, other.usuar_foto_perfil
-        FROM pedido_conexao pc
-        JOIN usuario other ON other.usuar_id = IF(pc.pedcon_usuar_remetente_id=?, pc.pedcon_usuar_destinatario_id, pc.pedcon_usuar_remetente_id)
-        WHERE pc.pedcon_estado='aceite'
-          AND (pc.pedcon_usuar_remetente_id=? OR pc.pedcon_usuar_destinatario_id=?)
-    ");
-    $st->execute([$userId, $userId, $userId]);
-    $connections = $st->fetchAll(PDO::FETCH_ASSOC);
-
-    $st = $db->prepare("
-        SELECT pc.pedcon_id AS request_id, u.usuar_id, u.usuar_nome, u.usuar_foto_perfil
-        FROM pedido_conexao pc
-        JOIN usuario u ON u.usuar_id = pc.pedcon_usuar_remetente_id
-        WHERE pc.pedcon_usuar_destinatario_id=? AND pc.pedcon_estado='pendente'
+        SELECT e.*, u.usuar_nome AS organizador, i.invite_estado,
+               (SELECT COUNT(*) FROM invite i2 WHERE i2.invite_evento_id=e.evento_id AND i2.invite_estado='confirmado') AS confirmados
+        FROM evento e
+        JOIN invite i ON i.invite_evento_id=e.evento_id
+        JOIN usuario u ON u.usuar_id=e.evento_usuar_id
+        WHERE i.invite_usuar_id=? AND i.invite_estado IN ('confirmado','pendente')
+        ORDER BY e.evento_data ASC
     ");
     $st->execute([$userId]);
-    ok(['connections' => $connections, 'pending' => $st->fetchAll(PDO::FETCH_ASSOC)]);
+    ok($st->fetchAll(PDO::FETCH_ASSOC));
 }
 
-if ($action === 'send_request') {
-    $userId   = requireLogin();
-    $targetId = (int)($_POST['targetId'] ?? 0);
-    if (!$targetId || $targetId === $userId) fail('Pedido inválido');
-
+if ($action === 'get_map_events') {
+    $userId = requireLogin();
     $db = db();
     $st = $db->prepare("
-        SELECT 1 FROM pedido_conexao
-        WHERE (pedcon_usuar_remetente_id=? AND pedcon_usuar_destinatario_id=?)
-           OR (pedcon_usuar_remetente_id=? AND pedcon_usuar_destinatario_id=?)
+        SELECT e.evento_id, e.evento_titulo, e.evento_local, e.evento_lat, e.evento_lng, e.evento_data
+        FROM evento e JOIN invite i ON i.invite_evento_id=e.evento_id
+        WHERE i.invite_usuar_id=? AND i.invite_estado='confirmado'
+          AND e.evento_estado!='cancelado' AND e.evento_lat IS NOT NULL
     ");
-    $st->execute([$userId, $targetId, $targetId, $userId]);
-    if ($st->fetch()) fail('Já existe um pedido');
-
-    $db->prepare("INSERT INTO pedido_conexao (pedcon_usuar_remetente_id, pedcon_usuar_destinatario_id) VALUES (?,?)")
-       ->execute([$userId, $targetId]);
-    ok(['requestId' => (int)$db->lastInsertId()]);
+    $st->execute([$userId]);
+    ok($st->fetchAll(PDO::FETCH_ASSOC));
 }
 
-if ($action === 'accept_request') {
+if ($action === 'create_event') {
+    $userId = requireLogin();
+    $title  = trim($_POST['title']       ?? '');
+    $desc   = trim($_POST['description'] ?? '');
+    $local  = trim($_POST['location']    ?? '');
+    $lat    = $_POST['lat'] ?? null;
+    $lng    = $_POST['lng'] ?? null;
+    $date   = trim($_POST['date']        ?? '');
+    if (!$title || !$date) fail('Título e data são obrigatórios');
+
+    $db = db();
+    $db->prepare("INSERT INTO evento (evento_usuar_id,evento_titulo,evento_descricao,evento_local,evento_lat,evento_lng,evento_data) VALUES (?,?,?,?,?,?,?)")
+       ->execute([$userId, $title, $desc, $local, $lat ?: null, $lng ?: null, $date]);
+    $eventId = (int)$db->lastInsertId();
+    $db->prepare("INSERT INTO invite (invite_evento_id,invite_usuar_id,invite_estado) VALUES (?,?,'confirmado')")
+       ->execute([$eventId, $userId]);
+    ok(['eventId' => $eventId]);
+}
+
+if ($action === 'invite_to_event') {
     $userId    = requireLogin();
-    $requestId = (int)($_POST['requestId'] ?? 0);
-    $st = db()->prepare("
-        UPDATE pedido_conexao SET pedcon_estado='aceite'
-        WHERE pedcon_id=? AND pedcon_usuar_destinatario_id=? AND pedcon_estado='pendente'
-    ");
-    $st->execute([$requestId, $userId]);
-    if (!$st->rowCount()) fail('Pedido não encontrado');
+    $eventId   = (int)($_POST['eventId']   ?? 0);
+    $inviteeId = (int)($_POST['inviteeId'] ?? 0);
+    if (!$eventId || !$inviteeId) fail('Dados em falta');
+
+    $db = db();
+    $st = $db->prepare("SELECT evento_usuar_id, evento_titulo, evento_data FROM evento WHERE evento_id=?");
+    $st->execute([$eventId]);
+    $ev = $st->fetch(PDO::FETCH_ASSOC);
+    if (!$ev) fail('Evento não encontrado');
+    if ($ev['evento_usuar_id'] != $userId) fail('Só o criador pode convidar');
+
+    $st = $db->prepare("SELECT 1 FROM pedido_conexao WHERE pedcon_estado='aceite' AND ((pedcon_usuar_remetente_id=? AND pedcon_usuar_destinatario_id=?) OR (pedcon_usuar_remetente_id=? AND pedcon_usuar_destinatario_id=?))");
+    $st->execute([$userId, $inviteeId, $inviteeId, $userId]);
+    if (!$st->fetch()) fail('Sem conexão com este utilizador');
+
+    $st = $db->prepare("SELECT 1 FROM invite WHERE invite_evento_id=? AND invite_usuar_id=?");
+    $st->execute([$eventId, $inviteeId]);
+    if ($st->fetch()) fail('Utilizador já convidado');
+
+    $db->prepare("INSERT INTO invite (invite_evento_id,invite_usuar_id,invite_estado) VALUES (?,?,'pendente')")
+       ->execute([$eventId, $inviteeId]);
+
+    $st = $db->prepare("SELECT pedcon_id FROM pedido_conexao WHERE pedcon_estado='aceite' AND ((pedcon_usuar_remetente_id=? AND pedcon_usuar_destinatario_id=?) OR (pedcon_usuar_remetente_id=? AND pedcon_usuar_destinatario_id=?)) LIMIT 1");
+    $st->execute([$userId, $inviteeId, $inviteeId, $userId]);
+    $conn = $st->fetch(PDO::FETCH_ASSOC);
+    if ($conn) {
+        $db->prepare("INSERT INTO post (post_connect_id,post_usuar_id,post_conteudo,post_tipo) VALUES (?,?,?,'invite')")
+           ->execute([$conn['pedcon_id'], $userId, "Convidei-te para o evento: \"{$ev['evento_titulo']}\" — {$ev['evento_data']}"]);
+    }
     ok();
 }
 
-if ($action === 'reject_request') {
-    $userId    = requireLogin();
-    $requestId = (int)($_POST['requestId'] ?? 0);
-    $st = db()->prepare("
-        UPDATE pedido_conexao SET pedcon_estado='recusado'
-        WHERE pedcon_id=? AND pedcon_usuar_destinatario_id=? AND pedcon_estado='pendente'
-    ");
-    $st->execute([$requestId, $userId]);
-    if (!$st->rowCount()) fail('Pedido não encontrado');
+if ($action === 'accept_event') {
+    $userId  = requireLogin();
+    $eventId = (int)($_POST['eventId'] ?? 0);
+    $st = db()->prepare("UPDATE invite SET invite_estado='confirmado' WHERE invite_evento_id=? AND invite_usuar_id=? AND invite_estado='pendente'");
+    $st->execute([$eventId, $userId]);
+    if (!$st->rowCount()) fail('Convite não encontrado');
+    ok();
+}
+
+if ($action === 'decline_event') {
+    $userId  = requireLogin();
+    $eventId = (int)($_POST['eventId'] ?? 0);
+    $st = db()->prepare("SELECT evento_usuar_id FROM evento WHERE evento_id=?");
+    $st->execute([$eventId]);
+    $ev = $st->fetch(PDO::FETCH_ASSOC);
+    if ($ev && $ev['evento_usuar_id'] == $userId) fail('O criador não pode sair — cancela o evento');
+    $st = db()->prepare("UPDATE invite SET invite_estado='recusado' WHERE invite_evento_id=? AND invite_usuar_id=? AND invite_estado IN ('pendente','confirmado')");
+    $st->execute([$eventId, $userId]);
+    if (!$st->rowCount()) fail('Convite não encontrado');
+    ok();
+}
+
+if ($action === 'cancel_event') {
+    $userId  = requireLogin();
+    $eventId = (int)($_POST['eventId'] ?? 0);
+    $db = db();
+    $st = $db->prepare("UPDATE evento SET evento_estado='cancelado' WHERE evento_id=? AND evento_usuar_id=?");
+    $st->execute([$eventId, $userId]);
+    if (!$st->rowCount()) fail('Evento não encontrado ou sem permissão');
+    $db->prepare("UPDATE invite SET invite_estado='cancelado' WHERE invite_evento_id=?")->execute([$eventId]);
+    ok();
+}
+
+if ($action === 'delete_event') {
+    $userId  = requireLogin();
+    $eventId = (int)($_POST['eventId'] ?? 0);
+    $st = db()->prepare("DELETE FROM evento WHERE evento_id=? AND evento_usuar_id=? AND evento_estado='cancelado'");
+    $st->execute([$eventId, $userId]);
+    if (!$st->rowCount()) fail('Só é possível apagar eventos cancelados');
     ok();
 }

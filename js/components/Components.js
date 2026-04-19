@@ -9,7 +9,6 @@ const Components = {
     return `<div class="avatar" style="width:${size}px;height:${size}px;font-size:${fs}px;">${initials}</div>`;
   },
 
-  
   interestCategories(interests) {
     const cats = { 'Música': [], 'Jogos': [], 'Cinema & Séries': [] };
     (interests || []).forEach(t => {
@@ -39,13 +38,13 @@ const Components = {
 
   sidebar(activePage) {
     const items = [
-      { id: 'events',  icon: 'events',  label: 'Eventos'   },
-      { id: 'home',    icon: 'connect', label: 'Descobrir' },
-      { id: 'chats',   icon: 'chat',    label: 'Mensagens' },
-      { id: 'profile', icon: 'profile', label: 'Perfil'    },
+      { id: 'events',  label: 'Eventos'   },
+      { id: 'home',    label: 'Descobrir' },
+      { id: 'chats',   label: 'Mensagens' },
+      { id: 'profile', label: 'Perfil'    },
     ];
     if (App.state.user?.role === 'admin') {
-      items.push({ id: 'admin', icon: 'admin', label: 'Admin' });
+      items.push({ id: 'admin', label: 'Admin' });
     }
     return `
       <aside class="sidebar">
@@ -54,8 +53,7 @@ const Components = {
           ${items.map(item => `
             <div class="nav-item ${activePage === item.id ? 'active' : ''}"
                  onclick="App.navigate('${item.id}')">
-              ${Icons[item.icon]}
-              <span>${item.label}</span>
+              ${item.label}
             </div>
           `).join('')}
         </nav>

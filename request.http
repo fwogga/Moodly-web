@@ -164,7 +164,7 @@ GET {{base}}/api/api.php?action=get_events&userId=2
 POST {{base}}/api/api.php?action=create_event
 Content-Type: application/x-www-form-urlencoded
 
-userId=2&title=Rock Night&description=Live music&location=Lisboa&lat=38.72&lng=-9.13&date=2026-06-15 21:00:00
+userId=1&title=evento teste&description=teste&location=Lisboa&lat=70&lng=90&date=2026-06-15 21:00:00
 
 ###
 POST {{base}}/api/api.php?action=invite_to_event
