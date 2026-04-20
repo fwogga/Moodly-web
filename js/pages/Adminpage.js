@@ -18,8 +18,6 @@ const AdminPage = {
         <div class="stat-box"><div class="stat-box-num">${s.users}</div><div class="stat-box-lbl">Utilizadores</div></div>
         <div class="stat-box"><div class="stat-box-num">${s.banned}</div><div class="stat-box-lbl">Banidos</div></div>
         <div class="stat-box"><div class="stat-box-num">${s.events}</div><div class="stat-box-lbl">Eventos</div></div>
-        <div class="stat-box"><div class="stat-box-num">${s.connections}</div><div class="stat-box-lbl">Conexões</div></div>
-        <div class="stat-box"><div class="stat-box-num">${s.messages}</div><div class="stat-box-lbl">Mensagens</div></div>
         <div class="stat-box"><div class="stat-box-num">${s.reports}</div><div class="stat-box-lbl">Reports pendentes</div></div>
       </div>
 
