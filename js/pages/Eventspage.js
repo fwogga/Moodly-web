@@ -142,7 +142,6 @@ const EventsPage = {
   },
 
   async showInvite(eventId) {
-    // Use already-loaded connections or fetch them now
     if (!App.state.connections.length) {
       const res = await App.api('get_connections', {}, 'GET');
       if (res.ok) App.state.connections = res.data.connections;
@@ -191,30 +190,6 @@ const EventsPage = {
   },
 
   async loadMap() {
-    const res = await App.api('get_map_events', {}, 'GET');
-    if (!res.ok || !res.data.length) { Components.toast('Sem eventos com localização.', 'info'); return; }
-
-    const mapEl = document.getElementById('map');
-    if (!mapEl) return;
-
-    if (typeof L === 'undefined') {
-      const link = document.createElement('link');
-      link.rel = 'stylesheet'; link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-      document.head.appendChild(link);
-      await new Promise(resolve => {
-        const s = document.createElement('script');
-        s.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-        s.onload = resolve; document.head.appendChild(s);
-      });
-    }
-
-    const first = res.data[0];
-    const map = L.map('map').setView([first.evento_lat, first.evento_lng], 12);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-    res.data.forEach(e => {
-      L.marker([e.evento_lat, e.evento_lng])
-       .bindPopup(`<b>${e.evento_titulo}</b><br>${e.evento_local || ''}<br>${e.evento_data}`)
-       .addTo(map);
-    });
-  },
-};
+    
+}
+}

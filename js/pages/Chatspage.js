@@ -10,8 +10,6 @@ const ChatsPage = {
     const messages    = isEventChat ? App.state.eventMessages : App.state.messages;
     const chatName    = App.state.activeChatName || '';
     const myId        = String(App.state.user?.userId);
-
-    // Event chats — confirmed events the user is part of
     const eventChats = (App.state.events || []).filter(e =>
       e.invite_estado === 'confirmado' && e.evento_estado !== 'cancelado'
     );
@@ -20,7 +18,7 @@ const ChatsPage = {
       ${Components.sidebar('chats')}
       <div style="flex:1;display:flex;overflow:hidden;height:100vh;">
 
-        <!-- Left column: conversation list -->
+        <!--list -->
         <div style="width:260px;min-width:260px;background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;height:100vh;overflow:hidden;">
           <div style="padding:14px;border-bottom:1px solid var(--border);flex-shrink:0;">
             <div style="font-weight:700;margin-bottom:8px;">Mensagens</div>
@@ -46,7 +44,6 @@ const ChatsPage = {
                 ${Components.avatar(e.evento_titulo, 34)}
                 <div style="flex:1;min-width:0;">
                   <div class="chat-item-name">${e.evento_titulo}</div>
-                  <div class="chat-item-preview" style="color:#555;">grupo</div>
                 </div>
               </div>
             `).join('')}
@@ -56,14 +53,13 @@ const ChatsPage = {
           </div>
         </div>
 
-        <!-- Right column: chatroom -->
+        <!--chatroom -->
         <div style="flex:1;display:flex;flex-direction:column;height:100vh;overflow:hidden;background:var(--bg);">
 
           ${chatName ? `
             <div style="padding:12px 18px;border-bottom:1px solid var(--border);background:var(--panel);display:flex;align-items:center;gap:10px;flex-shrink:0;">
               ${Components.avatar(chatName, 34)}
               <span style="font-weight:700;font-size:0.9rem;">${chatName}</span>
-              ${isEventChat ? `<span style="margin-left:auto;font-size:0.72rem;color:var(--dim);">grupo</span>` : ''}
             </div>
           ` : `
             <div style="padding:12px 18px;border-bottom:1px solid var(--border);background:var(--panel);height:59px;flex-shrink:0;"></div>
@@ -107,7 +103,6 @@ const ChatsPage = {
   async loadChats() {
     const res = await App.api('get_chats', {}, 'GET');
     if (res.ok) App.state.chats = res.data;
-    // Also load events if not already loaded so event chats appear in the list
     if (!App.state.eventsLoaded) {
       const res2 = await App.api('get_events', {}, 'GET');
       if (res2.ok) { App.state.events = res2.data; App.state.eventsLoaded = true; }
@@ -149,6 +144,8 @@ const ChatsPage = {
     App.state.chatsLoaded = true;
     await ChatsPage.openEventChat(eventId, App.state.activeChatName || '');
   },
+
+  async send() {
     const input = document.getElementById('msg-input');
     const text  = input?.value.trim();
     if (!text) return;
@@ -174,7 +171,7 @@ const ChatsPage = {
       const el = document.getElementById('msg-list');
       if (el) el.scrollTop = el.scrollHeight;
     }, 30);
-  }
+  },
 
   filter(query) {
     const listEl = document.getElementById('chat-list');
@@ -192,4 +189,4 @@ const ChatsPage = {
           </div>
         </div>
       `).join('');
-  }
+  }}

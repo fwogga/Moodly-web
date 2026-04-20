@@ -25,7 +25,7 @@ const AdminPage = {
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;">
 
-        <!-- Users -->
+        <!-- users -->
         <div>
           <div style="font-weight:700;margin-bottom:8px;">Utilizadores</div>
           <input type="text" placeholder="Pesquisar por nome..."
@@ -36,7 +36,7 @@ const AdminPage = {
           </div>
         </div>
 
-        <!-- Reports -->
+        <!-- reporte -->
         <div>
           <div style="font-weight:700;margin-bottom:8px;">Reports</div>
           <div id="admin-reports">
@@ -117,12 +117,9 @@ const AdminPage = {
   },
 
   async showUserProfile(userId) {
-    // Fetch full profile including interests and connection count
     const res = await App.api('get_profile', { targetId: userId }, 'GET');
     if (!res.ok) { Components.toast(res.error, 'error'); return; }
     const u = res.data;
-
-    // Also get ban status from adminUsers list
     const adminU = (App.state.adminUsers || []).find(x => x.usuar_id == userId) || {};
 
     Components.modal(`
@@ -134,7 +131,7 @@ const AdminPage = {
           <div style="font-size:0.82rem;color:#777;">Email: ${adminU.usuar_email || '—'}</div>
           <div style="font-size:0.82rem;color:#777;">Role: ${adminU.usuar_role || '—'}</div>
           <div style="font-size:0.82rem;${adminU.usuar_banned ? 'color:#f87171;' : 'color:#4ade80;'}">
-            ${adminU.usuar_banned ? 'Banido' : 'Activo'}
+            ${adminU.usuar_banned ? 'Banido' : 'Normal'}
           </div>
         </div>
       </div>

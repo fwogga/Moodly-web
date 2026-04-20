@@ -204,8 +204,6 @@ return `
     await App.api('set_interests', { tags });
     App.navigate('photo');
   },
-
-  // ── Photo step ──
   photoStep() {
     return `
 <div class="auth-box">
