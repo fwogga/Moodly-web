@@ -3,22 +3,22 @@ const App = {
   state: {
     page:           'login',
     user:           null,
-   
+
     discoverUsers:  [],
     discoverIndex:  0,
     discoverLoaded: false,
-    
+
     interests:      [],
-    selectedTags:   [],  
-    interestsLoaded:false,
-    
+    selectedTags:   [],
+    interestsLoaded: false,
+
     connections:    [],
     pendingRequests:[],
     connectionsLoaded: false,
-  
+
     events:         [],
     eventsLoaded:   false,
-    
+
     chats:          [],
     chatsLoaded:    false,
     activeChatId:   null,
@@ -26,9 +26,9 @@ const App = {
     messages:       [],
     activeEventId:  null,
     eventMessages:  [],
- 
+
     profile:        null,
-    
+
     adminStats:     null,
     adminUsers:     null,
     adminReports:   null,
@@ -70,15 +70,15 @@ const App = {
     app.className = authPages.has(page) ? 'auth' : '';
 
     const map = {
-      login:    () => AuthPages.login(),
-      signup:   () => AuthPages.signup(),
-      interests:() => AuthPages.interests(),
-      photo:    () => AuthPages.photoStep(),
-      home:     () => HomePage.render(),
-      events:   () => EventsPage.render(),
-      chats:    () => ChatsPage.render(),
-      profile:  () => ProfilePage.render(),
-      admin:    () => AdminPage.render(),
+      login:     () => AuthPages.login(),
+      signup:    () => AuthPages.signup(),
+      interests: () => AuthPages.interests(),
+      photo:     () => AuthPages.photoStep(),
+      home:      () => HomePage.render(),
+      events:    () => EventsPage.render(),
+      chats:     () => ChatsPage.render(),
+      profile:   () => ProfilePage.render(),
+      admin:     () => AdminPage.render(),
     };
 
     app.innerHTML = (map[page] || map.home)();
@@ -101,9 +101,13 @@ const App = {
     }
   },
 
+  async boot() {
+    return this.init();
+  },
+
   async logout() {
     await this.api('logout');
-    this.state.user = null;
+    this.state.user           = null;
     this.state.discoverLoaded = false;
     this.state.chatsLoaded    = false;
     this.state.eventsLoaded   = false;

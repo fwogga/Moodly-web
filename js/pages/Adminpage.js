@@ -23,7 +23,6 @@ const AdminPage = {
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;">
 
-        <!-- users -->
         <div>
           <div style="font-weight:700;margin-bottom:8px;">Utilizadores</div>
           <input type="text" placeholder="Pesquisar por nome..."
@@ -34,7 +33,6 @@ const AdminPage = {
           </div>
         </div>
 
-        <!-- reporte -->
         <div>
           <div style="font-weight:700;margin-bottom:8px;">Reports</div>
           <div id="admin-reports">
@@ -133,16 +131,11 @@ const AdminPage = {
           </div>
         </div>
       </div>
-
       <div style="margin-bottom:10px;">
         <div style="font-size:0.72rem;color:#777;text-transform:uppercase;margin-bottom:6px;">Interesses</div>
         ${Components.interestCategories(u.interests || [])}
       </div>
-
-      <div style="font-size:0.82rem;color:#777;margin-bottom:12px;">
-        ${u.connection_count} conexões
-      </div>
-
+      <div style="font-size:0.82rem;color:#777;margin-bottom:12px;">${u.connection_count} conexões</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
         ${adminU.usuar_role !== 'admin' ? `
           ${adminU.usuar_banned
@@ -152,8 +145,7 @@ const AdminPage = {
           <button class="btn btn-sm" onclick="AdminPage.promoteAdmin(${u.usuar_id})">Tornar admin</button>
         ` : ''}
         <button class="btn btn-sm" onclick="Components.closeModal()">Fechar</button>
-      </div>
-    `);
+      </div>`);
   },
 
   async toggleBan(userId, banned) {

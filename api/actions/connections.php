@@ -38,18 +38,14 @@ if ($action === 'send_request') {
     $st->execute([$userId, $targetId, $targetId, $userId]);
     if ($st->fetch()) fail('Já existe um pedido');
 
-    $db->prepare("INSERT INTO pedido_conexao (pedcon_usuar_remetente_id, pedcon_usuar_destinatario_id) VALUES (?,?)")
-       ->execute([$userId, $targetId]);
+    $db->prepare("INSERT INTO pedido_conexao (pedcon_usuar_remetente_id, pedcon_usuar_destinatario_id) VALUES (?,?)")->execute([$userId, $targetId]);
     ok(['requestId' => (int)$db->lastInsertId()]);
 }
 
 if ($action === 'accept_request') {
     $userId    = requireLogin();
     $requestId = (int)($_POST['requestId'] ?? 0);
-    $st = db()->prepare("
-        UPDATE pedido_conexao SET pedcon_estado='aceite'
-        WHERE pedcon_id=? AND pedcon_usuar_destinatario_id=? AND pedcon_estado='pendente'
-    ");
+    $st = db()->prepare("UPDATE pedido_conexao SET pedcon_estado='aceite' WHERE pedcon_id=? AND pedcon_usuar_destinatario_id=? AND pedcon_estado='pendente'");
     $st->execute([$requestId, $userId]);
     if (!$st->rowCount()) fail('Pedido não encontrado');
     ok();
@@ -58,10 +54,7 @@ if ($action === 'accept_request') {
 if ($action === 'reject_request') {
     $userId    = requireLogin();
     $requestId = (int)($_POST['requestId'] ?? 0);
-    $st = db()->prepare("
-        UPDATE pedido_conexao SET pedcon_estado='recusado'
-        WHERE pedcon_id=? AND pedcon_usuar_destinatario_id=? AND pedcon_estado='pendente'
-    ");
+    $st = db()->prepare("UPDATE pedido_conexao SET pedcon_estado='recusado' WHERE pedcon_id=? AND pedcon_usuar_destinatario_id=? AND pedcon_estado='pendente'");
     $st->execute([$requestId, $userId]);
     if (!$st->rowCount()) fail('Pedido não encontrado');
     ok();

@@ -58,7 +58,7 @@ if ($action === 'get_event_messages') {
 if ($action === 'send_event_message') {
     $userId  = requireLogin();
     $eventId = (int)($_POST['eventId'] ?? 0);
-    $text    = trim($_POST['message'] ?? '');
+    $text    = trim($_POST['message']  ?? '');
     if (!$text) fail('Mensagem vazia');
     $db = db();
     $st = $db->prepare("SELECT 1 FROM invite WHERE invite_evento_id=? AND invite_usuar_id=? AND invite_estado='confirmado'");

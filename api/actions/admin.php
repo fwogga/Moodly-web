@@ -49,7 +49,7 @@ if ($action === 'admin_get_reports') {
         SELECT r.*, reporter.usuar_nome AS reporter_nome, reported.usuar_nome AS reported_nome
         FROM user_report r
         JOIN usuario reporter ON reporter.usuar_id=r.report_reporter_id
-        JOIN usuario reported ON reported.usuar_id=r.report_reported_id
+        JOIN usuario reported  ON reported.usuar_id=r.report_reported_id
         ORDER BY r.report_created_at DESC
     ")->fetchAll(PDO::FETCH_ASSOC));
 }

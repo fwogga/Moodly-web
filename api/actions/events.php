@@ -30,21 +30,20 @@ if ($action === 'get_map_events') {
 }
 
 if ($action === 'create_event') {
-    $userId = requireLogin();
-    $title  = trim($_POST['title']       ?? '');
-    $desc   = trim($_POST['description'] ?? '');
-    $local  = trim($_POST['location']    ?? '');
-    $lat    = $_POST['lat'] ?? null;
-    $lng    = $_POST['lng'] ?? null;
-    $date   = trim($_POST['date']        ?? '');
+    $userId      = requireLogin();
+    $title       = trim($_POST['title']       ?? '');
+    $description = trim($_POST['description'] ?? '');
+    $location    = trim($_POST['location']    ?? '');
+    $lat         = $_POST['lat'] ?? null;
+    $lng         = $_POST['lng'] ?? null;
+    $date        = trim($_POST['date']        ?? '');
     if (!$title || !$date) fail('Título e data são obrigatórios');
 
     $db = db();
     $db->prepare("INSERT INTO evento (evento_usuar_id,evento_titulo,evento_descricao,evento_local,evento_lat,evento_lng,evento_data) VALUES (?,?,?,?,?,?,?)")
-       ->execute([$userId, $title, $desc, $local, $lat ?: null, $lng ?: null, $date]);
+       ->execute([$userId, $title, $description, $location, ($lat ?: null), ($lng ?: null), $date]);
     $eventId = (int)$db->lastInsertId();
-    $db->prepare("INSERT INTO invite (invite_evento_id,invite_usuar_id,invite_estado) VALUES (?,?,'confirmado')")
-       ->execute([$eventId, $userId]);
+    $db->prepare("INSERT INTO invite (invite_evento_id,invite_usuar_id,invite_estado) VALUES (?,?,'confirmado')")->execute([$eventId, $userId]);
     ok(['eventId' => $eventId]);
 }
 
@@ -57,9 +56,9 @@ if ($action === 'invite_to_event') {
     $db = db();
     $st = $db->prepare("SELECT evento_usuar_id, evento_titulo, evento_data FROM evento WHERE evento_id=?");
     $st->execute([$eventId]);
-    $ev = $st->fetch(PDO::FETCH_ASSOC);
-    if (!$ev) fail('Evento não encontrado');
-    if ($ev['evento_usuar_id'] != $userId) fail('Só o criador pode convidar');
+    $event = $st->fetch(PDO::FETCH_ASSOC);
+    if (!$event) fail('Evento não encontrado');
+    if ($event['evento_usuar_id'] != $userId) fail('Só o criador pode convidar');
 
     $st = $db->prepare("SELECT 1 FROM pedido_conexao WHERE pedcon_estado='aceite' AND ((pedcon_usuar_remetente_id=? AND pedcon_usuar_destinatario_id=?) OR (pedcon_usuar_remetente_id=? AND pedcon_usuar_destinatario_id=?))");
     $st->execute([$userId, $inviteeId, $inviteeId, $userId]);
@@ -69,16 +68,7 @@ if ($action === 'invite_to_event') {
     $st->execute([$eventId, $inviteeId]);
     if ($st->fetch()) fail('Utilizador já convidado');
 
-    $db->prepare("INSERT INTO invite (invite_evento_id,invite_usuar_id,invite_estado) VALUES (?,?,'pendente')")
-       ->execute([$eventId, $inviteeId]);
-
-    $st = $db->prepare("SELECT pedcon_id FROM pedido_conexao WHERE pedcon_estado='aceite' AND ((pedcon_usuar_remetente_id=? AND pedcon_usuar_destinatario_id=?) OR (pedcon_usuar_remetente_id=? AND pedcon_usuar_destinatario_id=?)) LIMIT 1");
-    $st->execute([$userId, $inviteeId, $inviteeId, $userId]);
-    $conn = $st->fetch(PDO::FETCH_ASSOC);
-    if ($conn) {
-        $db->prepare("INSERT INTO post (post_connect_id,post_usuar_id,post_conteudo,post_tipo) VALUES (?,?,?,'invite')")
-           ->execute([$conn['pedcon_id'], $userId, "Convidei-te para o evento: \"{$ev['evento_titulo']}\" — {$ev['evento_data']}"]);
-    }
+    $db->prepare("INSERT INTO invite (invite_evento_id,invite_usuar_id,invite_estado) VALUES (?,?,'pendente')")->execute([$eventId, $inviteeId]);
     ok();
 }
 
@@ -110,7 +100,7 @@ if ($action === 'cancel_event') {
     $db = db();
     $st = $db->prepare("UPDATE evento SET evento_estado='cancelado' WHERE evento_id=? AND evento_usuar_id=?");
     $st->execute([$eventId, $userId]);
-    if (!$st->rowCount()) fail('Evento não encontrado ou sem permissão');
+    if (!$st->rowCount()) fail('Sem permissão');
     $db->prepare("UPDATE invite SET invite_estado='cancelado' WHERE invite_evento_id=?")->execute([$eventId]);
     ok();
 }

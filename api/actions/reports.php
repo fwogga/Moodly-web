@@ -12,7 +12,6 @@ if ($action === 'report_user') {
     $st->execute([$userId, $reportedId]);
     if ($st->fetch()) fail('Já reportaste este utilizador');
 
-    $db->prepare("INSERT INTO user_report (report_reporter_id,report_reported_id,report_reason) VALUES (?,?,?)")
-       ->execute([$userId, $reportedId, $reason]);
+    $db->prepare("INSERT INTO user_report (report_reporter_id,report_reported_id,report_reason) VALUES (?,?,?)")->execute([$userId, $reportedId, $reason]);
     ok();
 }

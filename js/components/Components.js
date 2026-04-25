@@ -20,15 +20,14 @@ const Components = {
       }
     });
 
-    const labels = { 'Música': 'Música', 'Jogos': 'Jogos', 'Cinema & Séries': 'Cinema & Séries' };
     return `<div class="interest-categories">
       ${Object.entries(cats).map(([cat, tags]) => `
         <div class="interest-cat">
-          <div class="interest-cat-label">${labels[cat]}</div>
+          <div class="interest-cat-label">${cat}</div>
           <div class="interest-cat-tags">
             ${tags.length
               ? tags.map(t => `<span class="itag">${t}</span>`).join('')
-              : `<span style="color:var(--dim);font-size:0.78rem;">—</span>`
+              : `<span style="color:#777;font-size:0.78rem;">—</span>`
             }
           </div>
         </div>
@@ -48,7 +47,7 @@ const Components = {
     }
     return `
       <aside class="sidebar">
-        <div class="sidebar-logo"><img src="uploads/MoodlyLogo.png" alt="Moodly" class="logo-img"/>Moodly</span></div>
+        <div class="sidebar-logo"><img src="uploads/MoodlyLogo.png" alt="Moodly" class="logo-img"/>Moodly</div>
         <nav class="nav">
           ${items.map(item => `
             <div class="nav-item ${activePage === item.id ? 'active' : ''}"

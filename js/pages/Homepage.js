@@ -6,7 +6,7 @@ const HomePage = {
       HomePage.load();
       return Components.shell(`
         <div class="page-header"><div><h1>Descobrir</h1></div></div>
-        <p style="color:var(--dim);">A carregar...</p>
+        <p style="color:#777;">A carregar...</p>
       `, 'home');
     }
 

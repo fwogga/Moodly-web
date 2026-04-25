@@ -47,10 +47,7 @@ if ($action === 'search_users') {
     requireLogin();
     $q  = trim($_GET['q'] ?? '');
     $db = db();
-    $st = $db->prepare("
-        SELECT usuar_id, usuar_nome, usuar_foto_perfil
-        FROM usuario WHERE usuar_nome LIKE ? AND usuar_banned = 0 LIMIT 20
-    ");
+    $st = $db->prepare("SELECT usuar_id, usuar_nome, usuar_foto_perfil FROM usuario WHERE usuar_nome LIKE ? AND usuar_banned = 0 LIMIT 20");
     $st->execute(['%' . $q . '%']);
     ok($st->fetchAll(PDO::FETCH_ASSOC));
 }
@@ -75,10 +72,7 @@ if ($action === 'get_profile') {
     $st->execute([$targetId]);
     $user['interests'] = $st->fetchAll(PDO::FETCH_ASSOC);
 
-    $st = $db->prepare("
-        SELECT COUNT(*) FROM pedido_conexao
-        WHERE (pedcon_usuar_remetente_id=? OR pedcon_usuar_destinatario_id=?) AND pedcon_estado='aceite'
-    ");
+    $st = $db->prepare("SELECT COUNT(*) FROM pedido_conexao WHERE (pedcon_usuar_remetente_id=? OR pedcon_usuar_destinatario_id=?) AND pedcon_estado='aceite'");
     $st->execute([$targetId, $targetId]);
     $user['connection_count'] = (int)$st->fetchColumn();
     ok($user);
@@ -111,8 +105,9 @@ if ($action === 'upload_photo') {
     $st  = $db->prepare("SELECT usuar_foto_perfil FROM usuario WHERE usuar_id = ?");
     $st->execute([$userId]);
     $old = $st->fetchColumn();
-    if ($old && file_exists(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . $old)) {
-        unlink(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . $old);
+    if ($old) {
+        $oldPath = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . $old;
+        if (file_exists($oldPath)) unlink($oldPath);
     }
 
     $filename = "user_{$userId}_" . time() . ".{$ext}";

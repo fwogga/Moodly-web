@@ -6,7 +6,7 @@ const ProfilePage = {
       ProfilePage.load();
       return Components.shell(`
         <div class="page-header"><div><h1>Perfil</h1></div></div>
-        <p style="color:var(--dim);">A carregar...</p>
+        <p style="color:#777;">A carregar...</p>
       `, 'profile');
     }
 
@@ -59,7 +59,7 @@ const ProfilePage = {
               </div>
             `).join('')}
             ${!App.state.connections.length
-              ? `<span style="color:var(--dim);font-size:0.84rem;">Sem conexões ainda</span>`
+              ? `<span style="color:#777;font-size:0.84rem;">Sem conexões ainda</span>`
               : ''}
           </div>
 
@@ -173,29 +173,5 @@ const ProfilePage = {
     const res = await App.api('reject_request', { requestId });
     if (res.ok) ProfilePage.reload();
     else Components.toast(res.error, 'error');
-  },
-
-  showReport(userId, name) {
-    Components.modal(`
-      <h3>Reportar ${name}</h3>
-      <div class="form-group">
-        <label class="form-label">Motivo</label>
-        <input class="form-input" id="rep-reason" type="text" placeholder="Descreve o problema"/>
-      </div>
-      <div id="rep-err" class="error-msg" style="display:none;margin-bottom:8px;"></div>
-      <div class="modal-footer">
-        <button class="btn btn-outline" onclick="Components.closeModal()">Cancelar</button>
-        <button class="btn btn-danger" onclick="ProfilePage.sendReport(${userId})">Reportar</button>
-      </div>`);
-  },
-
-  async sendReport(userId) {
-    const reason = document.getElementById('rep-reason')?.value.trim();
-    const errEl  = document.getElementById('rep-err');
-    errEl.style.display = 'none';
-    if (!reason) { errEl.textContent = 'Preenche o motivo'; errEl.style.display = 'block'; return; }
-    const res = await App.api('report_user', { reportedId: userId, reason });
-    if (res.ok) { Components.closeModal(); Components.toast('Reportado.', 'info'); }
-    else { errEl.textContent = res.error; errEl.style.display = 'block'; }
   },
 };

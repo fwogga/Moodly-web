@@ -1,4 +1,3 @@
-
 const InterestInput = {
 
   CATS: ['Música', 'Jogos', 'Cinema & Séries'],
@@ -100,27 +99,27 @@ const InterestInput = {
 
 const AuthPages = {
 
-login() {
-return `
-<div class="auth-box">
-  <div class="auth-logo">Mood<span>ly</span></div>
-  <h2>Bem-vindo de volta</h2>
-  <p>Entra na tua conta</p>
-  <div class="form-group">
-    <label class="form-label">Email</label>
-    <input class="form-input" type="email" id="l-email" placeholder="email@exemplo.com"
-            onkeydown="if(event.key==='Enter') AuthPages.doLogin()"/>
-  </div>
-  <div class="form-group">
-    <label class="form-label">Senha</label>
-    <input class="form-input" type="password" id="l-pass" placeholder="••••••••"
-            onkeydown="if(event.key==='Enter') AuthPages.doLogin()"/>
-  </div>
-  <div id="l-err" class="error-msg" style="display:none;margin-bottom:10px;"></div>
-  <button class="btn btn-primary btn-full" id="l-btn" onclick="AuthPages.doLogin()">Entrar</button>
-  <div class="auth-switch">Não tens conta? <a onclick="App.navigate('signup')">Cria uma aqui</a></div>
-</div>`;
-},
+  login() {
+    return `
+      <div class="auth-box">
+        <div class="auth-logo">Mood<span>ly</span></div>
+        <h2>Bem-vindo de volta</h2>
+        <p>Entra na tua conta</p>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input class="form-input" type="email" id="l-email" placeholder="email@exemplo.com"
+                 onkeydown="if(event.key==='Enter') AuthPages.doLogin()"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Senha</label>
+          <input class="form-input" type="password" id="l-pass" placeholder="••••••••"
+                 onkeydown="if(event.key==='Enter') AuthPages.doLogin()"/>
+        </div>
+        <div id="l-err" class="error-msg" style="display:none;margin-bottom:10px;"></div>
+        <button class="btn btn-primary btn-full" id="l-btn" onclick="AuthPages.doLogin()">Entrar</button>
+        <div class="auth-switch">Não tens conta? <a onclick="App.navigate('signup')">Cria uma aqui</a></div>
+      </div>`;
+  },
 
   async doLogin() {
     const email = document.getElementById('l-email')?.value.trim();
@@ -140,27 +139,27 @@ return `
 
   signup() {
     return `
-<div class="auth-box">
-<div class="auth-logo">Mood<span>ly</span></div>
-<h2>Criar conta</h2>
-<p>Junta-te à comunidade Moodly</p>
-<div class="form-group">
-  <label class="form-label">Nome</label>
-  <input class="form-input" type="text" id="s-name" placeholder="O teu nome"/>
-</div>
-<div class="form-group">
-  <label class="form-label">Email</label>
-  <input class="form-input" type="email" id="s-email" placeholder="email@exemplo.com"/>
-</div>
-<div class="form-group">
-  <label class="form-label">Senha</label>
-  <input class="form-input" type="password" id="s-pass" placeholder="••••••••"
-          onkeydown="if(event.key==='Enter') AuthPages.doSignup()"/>
-</div>
-<div id="s-err" class="error-msg" style="display:none;margin-bottom:10px;"></div>
-<button class="btn btn-primary btn-full" id="s-btn" onclick="AuthPages.doSignup()">Criar conta</button>
-<div class="auth-switch">Já tens conta? <a onclick="App.navigate('login')">Inicia sessão</a></div>
-</div>`;
+      <div class="auth-box">
+        <div class="auth-logo">Mood<span>ly</span></div>
+        <h2>Criar conta</h2>
+        <p>Junta-te à comunidade Moodly</p>
+        <div class="form-group">
+          <label class="form-label">Nome</label>
+          <input class="form-input" type="text" id="s-name" placeholder="O teu nome"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input class="form-input" type="email" id="s-email" placeholder="email@exemplo.com"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Senha</label>
+          <input class="form-input" type="password" id="s-pass" placeholder="••••••••"
+                 onkeydown="if(event.key==='Enter') AuthPages.doSignup()"/>
+        </div>
+        <div id="s-err" class="error-msg" style="display:none;margin-bottom:10px;"></div>
+        <button class="btn btn-primary btn-full" id="s-btn" onclick="AuthPages.doSignup()">Criar conta</button>
+        <div class="auth-switch">Já tens conta? <a onclick="App.navigate('login')">Inicia sessão</a></div>
+      </div>`;
   },
 
   async doSignup() {
@@ -204,25 +203,26 @@ return `
     await App.api('set_interests', { tags });
     App.navigate('photo');
   },
+
   photoStep() {
     return `
-<div class="auth-box">
-<div class="auth-logo">Mood<span>ly</span></div>
-<h2>Foto de perfil</h2>
-<p>Opcional. Podes adicionar ou alterar mais tarde.</p>
-<div style="text-align:center;margin-bottom:16px;">
-<div id="photo-preview" style="width:90px;height:90px;border-radius:50%;background:var(--purple);display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:700;margin:0 auto 12px;overflow:hidden;">
-  ${(App.state.user?.name || '?')[0].toUpperCase()}
-</div>
-<label class="btn btn-outline" style="cursor:pointer;">
-  Escolher foto
-  <input type="file" accept="image/*" style="display:none" onchange="AuthPages.previewPhoto(this)"/>
-</label>
-</div>
-<div id="photo-err" class="error-msg" style="display:none;margin-bottom:10px;"></div>
-<button class="btn btn-primary btn-full" id="photo-btn" onclick="AuthPages.uploadPhoto()">Guardar e entrar</button>
-<div class="auth-switch"><a onclick="App.navigate('home')">Saltar</a></div>
-</div>`;
+      <div class="auth-box">
+        <div class="auth-logo">Mood<span>ly</span></div>
+        <h2>Foto de perfil</h2>
+        <p>Opcional. Podes adicionar ou alterar mais tarde.</p>
+        <div style="text-align:center;margin-bottom:16px;">
+          <div id="photo-preview" style="width:90px;height:90px;border-radius:50%;background:#444;display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:700;margin:0 auto 12px;overflow:hidden;">
+            ${(App.state.user?.name || '?')[0].toUpperCase()}
+          </div>
+          <label class="btn btn-outline" style="cursor:pointer;">
+            Escolher foto
+            <input type="file" accept="image/*" style="display:none" onchange="AuthPages.previewPhoto(this)"/>
+          </label>
+        </div>
+        <div id="photo-err" class="error-msg" style="display:none;margin-bottom:10px;"></div>
+        <button class="btn btn-primary btn-full" id="photo-btn" onclick="AuthPages.uploadPhoto()">Guardar e entrar</button>
+        <div class="auth-switch"><a onclick="App.navigate('home')">Saltar</a></div>
+      </div>`;
   },
 
   previewPhoto(input) {

@@ -4,8 +4,8 @@ require_once __DIR__ . '/db.php';
 
 header('Content-Type: application/json');
 
-function ok($data = []) { echo json_encode(['ok' => true, 'data' => $data]); exit; }
-function fail($msg)     { echo json_encode(['ok' => false, 'error' => $msg]); exit; }
+function ok($data = [])  { echo json_encode(['ok' => true,  'data'  => $data]); exit; }
+function fail($message)  { echo json_encode(['ok' => false, 'error' => $message]); exit; }
 
 function requireLogin() {
     if (!empty($_SESSION['user_id'])) return (int)$_SESSION['user_id'];
