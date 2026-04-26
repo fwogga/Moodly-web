@@ -74,7 +74,7 @@ const EventsPage = {
     return btns.join('');
   },
 
-
+  // ── map picker state ──────────────────────────────────────────
   _pickerMap:    null,
   _pickerMarker: null,
   _pickerLat:    null,
@@ -241,7 +241,6 @@ const EventsPage = {
     App.navigate('events');
   },
 
-
   async accept(eventId) {
     const res = await App.api('accept_event', { eventId });
     if (res.ok) { Components.toast('Participação confirmada!', 'success'); App.state.eventsLoaded = false; App.navigate('events'); }
@@ -273,15 +272,18 @@ const EventsPage = {
       if (res.ok) App.state.connections = res.data.connections;
     }
 
+    const connections = App.state.connections;
+
     Components.modal(`
       <h3>Convidar para o evento</h3>
-      ${!App.state.connections.length
+      ${!connections.length
         ? `<p style="color:#777;font-size:0.85rem;">Não tens conexões para convidar.</p>`
         : `<div style="display:flex;flex-direction:column;gap:4px;max-height:300px;overflow-y:auto;">
-            ${App.state.connections.map(c => `
+            ${connections.map(c => `
               <div class="row" style="cursor:pointer;padding:8px;" onclick="EventsPage.sendInvite(${eventId}, ${c.usuar_id}, '${c.usuar_nome.replace(/'/g,"\\'")}')">
                 ${Components.avatar(c.usuar_nome, 32, c.usuar_foto_perfil || '')}
                 <div class="row-name">${c.usuar_nome}</div>
+                <span style="color:#777;font-size:0.78rem;">#${c.usuar_id}</span>
               </div>`).join('')}
            </div>`
       }
@@ -309,7 +311,15 @@ const EventsPage = {
     App.state.activeChatName = title;
     App.state.eventMessages  = [];
     App.state.chatsLoaded    = true;
-    ChatsPage.loadEventMessages(eventId);
+    App.navigate('chats');
+    App.api('get_event_messages', { eventId }, 'GET').then(res => {
+      if (res.ok) App.state.eventMessages = res.data;
+      App.render();
+      setTimeout(() => {
+        const el = document.getElementById('msg-list');
+        if (el) el.scrollTop = el.scrollHeight;
+      }, 30);
+    });
   },
 
   async loadMap() {
@@ -330,4 +340,4 @@ const EventsPage = {
        .addTo(map);
     });
   },
-};
+}

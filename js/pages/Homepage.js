@@ -6,7 +6,7 @@ const HomePage = {
       HomePage.load();
       return Components.shell(`
         <div class="page-header"><div><h1>Descobrir</h1></div></div>
-        <p style="color:#777;">A carregar...</p>
+        <p style="color:var(--dim);">A carregar...</p>
       `, 'home');
     }
 
@@ -26,7 +26,7 @@ const HomePage = {
     const photo = user.usuar_foto_perfil || '';
     const inits = (user.usuar_nome || '?').split(' ').map(w => w[0]).slice(0,2).join('').toUpperCase();
 
-    return Components.shell(`
+    const html = Components.shell(`
       <div class="page-header">
         <div><h1>Descobrir</h1></div>
         <input type="text" placeholder="Pesquisar utilizadores..."
@@ -66,7 +66,28 @@ const HomePage = {
         </div>
 
       </div>
+
+      <div style="display:flex;gap:16px;margin-top:24px;align-items:flex-start;">
+
+        <div style="flex:1;">
+          <div style="font-weight:700;margin-bottom:8px;font-size:0.9rem;">Pedidos enviados</div>
+          <div id="sent-requests-list" style="display:flex;flex-direction:column;gap:6px;">
+            <span style="color:#777;font-size:0.82rem;">A carregar...</span>
+          </div>
+        </div>
+
+        <div style="flex:1;">
+          <div style="font-weight:700;margin-bottom:8px;font-size:0.9rem;">Novas conexões</div>
+          <div id="new-connections-list" style="display:flex;flex-direction:column;gap:6px;">
+            <span style="color:#777;font-size:0.82rem;">A carregar...</span>
+          </div>
+        </div>
+
+      </div>
     `, 'home');
+
+    setTimeout(() => HomePage.loadSocial(), 0);
+    return html;
   },
 
   async load() {
@@ -76,6 +97,54 @@ const HomePage = {
       App.state.discoverIndex = 0;
     }
     App.render();
+  },
+
+  async loadSocial() {
+    const [sentRes, newConnRes] = await Promise.all([
+      App.api('get_sent_requests',   {}, 'GET'),
+      App.api('get_new_connections', {}, 'GET'),
+    ]);
+
+    const sentEl    = document.getElementById('sent-requests-list');
+    const newConnEl = document.getElementById('new-connections-list');
+
+    if (sentEl) {
+      const sent = sentRes.ok ? sentRes.data : [];
+      sentEl.innerHTML = sent.length
+        ? sent.map(u => `
+            <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #2a2a2a;">
+              ${Components.avatar(u.usuar_nome, 30, u.usuar_foto_perfil || '')}
+              <div style="flex:1;font-size:0.84rem;">${u.usuar_nome}</div>
+              <span style="font-size:0.72rem;color:#777;">Pendente</span>
+            </div>`).join('')
+        : `<span style="color:#777;font-size:0.82rem;">Sem pedidos pendentes</span>`;
+    }
+
+    if (newConnEl) {
+      const newConns = newConnRes.ok ? newConnRes.data : [];
+      newConnEl.innerHTML = newConns.length
+        ? newConns.map(c => `
+            <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #2a2a2a;">
+              ${Components.avatar(c.usuar_nome, 30, c.usuar_foto_perfil || '')}
+              <div style="flex:1;font-size:0.84rem;">${c.usuar_nome}</div>
+              <button class="btn btn-sm btn-primary"
+                      onclick="HomePage.startChat(${c.connection_id}, '${c.usuar_nome.replace(/'/g,"\\'")}', this)">
+                Mensagem
+              </button>
+            </div>`).join('')
+        : `<span style="color:#777;font-size:0.82rem;">Sem novas conexões</span>`;
+    }
+  },
+
+  async startChat(connectionId, name, btnEl) {
+    btnEl.closest('div').remove();
+    App.state.activeChatId   = connectionId;
+    App.state.activeChatName = name;
+    App.state.activeEventId  = null;
+    App.state.messages       = [];
+    // Reset so chats page loads fresh list
+    App.state.chatsLoaded    = false;
+    App.navigate('chats');
   },
 
   pass() {

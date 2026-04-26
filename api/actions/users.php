@@ -90,14 +90,13 @@ if ($action === 'update_profile') {
 if ($action === 'upload_photo') {
     $userId = requireLogin();
     if (empty($_FILES['photo']) || $_FILES['photo']['error'] !== UPLOAD_ERR_OK) fail('Erro no upload');
-    $file    = $_FILES['photo'];
-    $allowed = ['image/jpeg','image/png','image/webp'];
-    $finfo   = new finfo(FILEINFO_MIME_TYPE);
-    $mime    = $finfo->file($file['tmp_name']);
-    if (!in_array($mime, $allowed)) fail('Tipo de ficheiro inválido');
+    $file = $_FILES['photo'];
+
+    $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+    $allowed = ['jpg', 'jpeg', 'png', 'webp'];
+    if (!in_array($ext, $allowed)) fail('Tipo de ficheiro inválido');
     if ($file['size'] > 5 * 1024 * 1024) fail('Ficheiro demasiado grande');
 
-    $ext = ['image/jpeg'=>'jpg','image/png'=>'png','image/webp'=>'webp'][$mime];
     $dir = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR;
     if (!is_dir($dir)) mkdir($dir, 0755, true);
 
@@ -105,9 +104,8 @@ if ($action === 'upload_photo') {
     $st  = $db->prepare("SELECT usuar_foto_perfil FROM usuario WHERE usuar_id = ?");
     $st->execute([$userId]);
     $old = $st->fetchColumn();
-    if ($old) {
-        $oldPath = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . $old;
-        if (file_exists($oldPath)) unlink($oldPath);
+    if ($old && file_exists(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . $old)) {
+        unlink(__DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . $old);
     }
 
     $filename = "user_{$userId}_" . time() . ".{$ext}";

@@ -20,11 +20,8 @@ const ChatsPage = {
 
         <!--list -->
         <div style="width:260px;min-width:260px;background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;height:100vh;overflow:hidden;">
-          <div style="padding:14px;border-bottom:1px solid var(--border);flex-shrink:0;">
-            <div style="font-weight:700;margin-bottom:8px;">Mensagens</div>
-            <input class="form-input" type="text" placeholder="Pesquisar..."
-                   style="font-size:0.82rem;padding:6px 10px;"
-                   oninput="ChatsPage.filter(this.value)"/>
+          <div style="padding:20px 20px 12px;border-bottom:1px solid var(--border);flex-shrink:0;">
+            <h1>Mensagens</h1>
           </div>
           <div style="flex:1;overflow-y:auto;" id="chat-list">
 
@@ -106,6 +103,11 @@ const ChatsPage = {
     if (!App.state.eventsLoaded) {
       const res2 = await App.api('get_events', {}, 'GET');
       if (res2.ok) { App.state.events = res2.data; App.state.eventsLoaded = true; }
+    }
+    // If a chat was pre-selected (e.g. from startChat), load its messages
+    if (App.state.activeChatId && !App.state.messages.length) {
+      const msgRes = await App.api('get_messages', { connectionId: App.state.activeChatId }, 'GET');
+      if (msgRes.ok) App.state.messages = msgRes.data;
     }
     App.render();
   },
@@ -189,4 +191,5 @@ const ChatsPage = {
           </div>
         </div>
       `).join('');
-  }}
+  },
+};
