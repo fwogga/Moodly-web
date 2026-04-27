@@ -74,7 +74,6 @@ const EventsPage = {
     return btns.join('');
   },
 
-  // ── map picker state ──────────────────────────────────────────
   _pickerMap:    null,
   _pickerMarker: null,
   _pickerLat:    null,
@@ -310,16 +309,8 @@ const EventsPage = {
     App.state.activeChatId   = null;
     App.state.activeChatName = title;
     App.state.eventMessages  = [];
-    App.state.chatsLoaded    = true;
+    App.state.chatsLoaded    = false;
     App.navigate('chats');
-    App.api('get_event_messages', { eventId }, 'GET').then(res => {
-      if (res.ok) App.state.eventMessages = res.data;
-      App.render();
-      setTimeout(() => {
-        const el = document.getElementById('msg-list');
-        if (el) el.scrollTop = el.scrollHeight;
-      }, 30);
-    });
   },
 
   async loadMap() {

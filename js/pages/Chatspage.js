@@ -104,12 +104,19 @@ const ChatsPage = {
       const res2 = await App.api('get_events', {}, 'GET');
       if (res2.ok) { App.state.events = res2.data; App.state.eventsLoaded = true; }
     }
-    // If a chat was pre-selected (e.g. from startChat), load its messages
-    if (App.state.activeChatId && !App.state.messages.length) {
-      const msgRes = await App.api('get_messages', { connectionId: App.state.activeChatId }, 'GET');
-      if (msgRes.ok) App.state.messages = msgRes.data;
+    // Pre-load messages if a chat was already selected (e.g. navigating from events page)
+    if (App.state.activeEventId && !App.state.eventMessages.length) {
+      const res3 = await App.api('get_event_messages', { eventId: App.state.activeEventId }, 'GET');
+      if (res3.ok) App.state.eventMessages = res3.data;
+    } else if (App.state.activeChatId && !App.state.messages.length) {
+      const res3 = await App.api('get_messages', { connectionId: App.state.activeChatId }, 'GET');
+      if (res3.ok) App.state.messages = res3.data;
     }
     App.render();
+    setTimeout(() => {
+      const el = document.getElementById('msg-list');
+      if (el) el.scrollTop = el.scrollHeight;
+    }, 30);
   },
 
   async openChat(connectionId, name) {
@@ -132,14 +139,8 @@ const ChatsPage = {
     App.state.activeChatName = title;
     App.state.activeChatId   = null;
     App.state.eventMessages  = [];
-    App.render();
-    const res = await App.api('get_event_messages', { eventId }, 'GET');
-    if (res.ok) App.state.eventMessages = res.data;
-    App.render();
-    setTimeout(() => {
-      const el = document.getElementById('msg-list');
-      if (el) el.scrollTop = el.scrollHeight;
-    }, 30);
+    App.state.chatsLoaded    = false;
+    App.navigate('chats');
   },
 
   async loadEventMessages(eventId) {
