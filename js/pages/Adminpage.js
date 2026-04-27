@@ -23,7 +23,7 @@ const AdminPage = {
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;">
 
-        <!-- users -->
+        <!-- user -->
         <div>
           <div style="font-weight:700;margin-bottom:8px;">Utilizadores</div>
           <input type="text" placeholder="Pesquisar por nome..."

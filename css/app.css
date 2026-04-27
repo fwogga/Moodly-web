@@ -124,7 +124,7 @@ a, .link { color: #FFD600; cursor: pointer; }
 .badge-pending   { font-size: 0.7rem; color: #FFD600; border: 1px solid rgba(255,214,0,0.3); padding: 1px 7px; border-radius: 999px; }
 
 .stat-box     { border: 1px solid #333; padding: 10px 14px; text-align: center; }
-.stat-box-num { font-size: 1.2rem; font-weight: 700; color: #FFD600; }
+.stat-box-num { font-size: 1.2rem; font-weight: 700; color: #ffffff; }
 .stat-box-lbl { font-size: 0.7rem; color: #777; margin-top: 2px; }
 table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
 th { text-align: left; padding: 5px 8px; border-bottom: 1px solid #333; color: #aaa; }

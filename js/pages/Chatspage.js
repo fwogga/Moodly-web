@@ -104,7 +104,7 @@ const ChatsPage = {
       const res2 = await App.api('get_events', {}, 'GET');
       if (res2.ok) { App.state.events = res2.data; App.state.eventsLoaded = true; }
     }
-    // Pre-load messages if a chat was already selected (e.g. navigating from events page)
+  
     if (App.state.activeEventId && !App.state.eventMessages.length) {
       const res3 = await App.api('get_event_messages', { eventId: App.state.activeEventId }, 'GET');
       if (res3.ok) App.state.eventMessages = res3.data;

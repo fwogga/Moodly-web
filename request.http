@@ -213,7 +213,7 @@ GET {{base}}/api/api.php?action=get_messages&userId=2&connectionId=1
 POST {{base}}/api/api.php?action=send_message
 Content-Type: application/x-www-form-urlencoded
 
-userId=2&connectionId=1&message=Hey, como estás?
+userId=10&connectionId=13&message=hmmmm
 
 ###
 POST {{base}}/api/api.php?action=send_message

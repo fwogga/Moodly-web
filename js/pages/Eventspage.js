@@ -167,7 +167,7 @@ const EventsPage = {
         const a = data.address;
         input.value = [a.city || a.town || a.village, a.country].filter(Boolean).join(', ');
       }
-    } catch (e) { /* user types manually */ }
+    } catch (e) { }
   },
 
   searchLocation(term) {

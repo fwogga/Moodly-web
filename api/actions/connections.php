@@ -38,7 +38,6 @@ if ($action === 'get_sent_requests') {
 }
 
 if ($action === 'get_new_connections') {
-    // Connections with no messages yet
     $userId = requireLogin();
     $db = db();
     $st = $db->prepare("

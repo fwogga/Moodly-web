@@ -142,7 +142,6 @@ const HomePage = {
     App.state.activeChatName = name;
     App.state.activeEventId  = null;
     App.state.messages       = [];
-    // Reset so chats page loads fresh list
     App.state.chatsLoaded    = false;
     App.navigate('chats');
   },
