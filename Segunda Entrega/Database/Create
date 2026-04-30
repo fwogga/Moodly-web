@@ -1,0 +1,209 @@
+DROP DATABASE IF EXISTS moodly;
+CREATE DATABASE moodly
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_unicode_ci;
+
+USE moodly;
+
+------------------------------------------------
+-- users
+------------------------------------------------
+
+CREATE TABLE usuario (
+    usuar_id          INT AUTO_INCREMENT PRIMARY KEY,
+    usuar_nome        VARCHAR(100)  NOT NULL,
+    usuar_email       VARCHAR(150)  NOT NULL UNIQUE,
+    usuar_senha_hash  VARCHAR(255)  NOT NULL,
+    usuar_foto_perfil VARCHAR(300)  DEFAULT NULL,
+    usuar_role        ENUM('user','admin') NOT NULL DEFAULT 'user',
+    usuar_banned      BOOLEAN       NOT NULL DEFAULT FALSE,
+    usuar_data_registo DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_usuario_nome ON usuario(usuar_nome);
+
+------------------------------------------------
+-- interesses
+------------------------------------------------
+
+CREATE TABLE interesse (
+    inter_id   INT AUTO_INCREMENT PRIMARY KEY,
+    inter_nome VARCHAR(60) NOT NULL UNIQUE
+);
+
+CREATE TABLE subinteresse (
+    subinter_id       INT AUTO_INCREMENT PRIMARY KEY,
+    subinter_inter_id INT NOT NULL,
+    subinter_nome     VARCHAR(100) NOT NULL,
+    UNIQUE (subinter_inter_id, subinter_nome),
+    FOREIGN KEY (subinter_inter_id) REFERENCES interesse(inter_id) ON DELETE CASCADE
+);
+
+CREATE TABLE usuario_interesse (
+    usint_id          INT AUTO_INCREMENT PRIMARY KEY,
+    usint_usuar_id    INT NOT NULL,
+    usint_subinter_id INT NOT NULL,
+    UNIQUE (usint_usuar_id, usint_subinter_id),
+    FOREIGN KEY (usint_usuar_id)    REFERENCES usuario(usuar_id)         ON DELETE CASCADE,
+    FOREIGN KEY (usint_subinter_id) REFERENCES subinteresse(subinter_id) ON DELETE CASCADE
+);
+
+------------------------------------------------
+-- conex
+------------------------------------------------
+
+CREATE TABLE pedido_conexao (
+    pedcon_id                    INT AUTO_INCREMENT PRIMARY KEY,
+    pedcon_usuar_remetente_id    INT NOT NULL,
+    pedcon_usuar_destinatario_id INT NOT NULL,
+    pedcon_estado                ENUM('pendente','aceite','recusado') NOT NULL DEFAULT 'pendente',
+    pedcon_criado_em             DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (pedcon_usuar_remetente_id, pedcon_usuar_destinatario_id),
+    FOREIGN KEY (pedcon_usuar_remetente_id)    REFERENCES usuario(usuar_id) ON DELETE CASCADE,
+    FOREIGN KEY (pedcon_usuar_destinatario_id) REFERENCES usuario(usuar_id) ON DELETE CASCADE
+);
+
+------------------------------------------------
+-- DIRECT (PRIVATE) CHAT MESSAGES
+-- post_tipo distinguishes normal text from event-invite messages.
+-- post_invite_id links back to the invite row when tipo = 'invite'.
+------------------------------------------------
+
+CREATE TABLE post (
+    post_id         INT AUTO_INCREMENT PRIMARY KEY,
+    post_connect_id INT  NOT NULL,
+    post_usuar_id   INT  NOT NULL,
+    post_conteudo   TEXT NOT NULL,
+    post_tipo       ENUM('text','invite') NOT NULL DEFAULT 'text',
+    post_invite_id  INT  DEFAULT NULL,
+    post_data_envio DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (post_connect_id) REFERENCES pedido_conexao(pedcon_id) ON DELETE CASCADE,
+    FOREIGN KEY (post_usuar_id)   REFERENCES usuario(usuar_id)         ON DELETE CASCADE
+    -- post_invite_id FK added after invite table is created (see ALTER below)
+);
+
+------------------------------------------------
+-- evcento
+------------------------------------------------
+
+CREATE TABLE evento (
+    evento_id           INT AUTO_INCREMENT PRIMARY KEY,
+    evento_usuar_id     INT          NOT NULL,
+    evento_titulo       VARCHAR(150) NOT NULL,
+    evento_descricao    TEXT,
+    evento_local        VARCHAR(200),
+    evento_lat          DOUBLE,
+    evento_lng          DOUBLE,
+    evento_data         DATETIME,
+    evento_estado       ENUM('activo','cancelado') NOT NULL DEFAULT 'activo',
+    evento_data_criacao DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (evento_usuar_id) REFERENCES usuario(usuar_id) ON DELETE CASCADE
+);
+
+------------------------------------------------
+-- invites
+------------------------------------------------
+
+CREATE TABLE invite (
+    invite_id         INT AUTO_INCREMENT PRIMARY KEY,
+    invite_evento_id  INT NOT NULL,
+    invite_usuar_id   INT NOT NULL,
+    invite_estado     ENUM('pendente','confirmado','recusado','cancelado') NOT NULL DEFAULT 'pendente',
+    invite_data_envio DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (invite_evento_id, invite_usuar_id),
+    FOREIGN KEY (invite_evento_id) REFERENCES evento(evento_id) ON DELETE CASCADE,
+    FOREIGN KEY (invite_usuar_id)  REFERENCES usuario(usuar_id) ON DELETE CASCADE
+);
+
+-- Link post back to invite now that invite table exists
+ALTER TABLE post
+    ADD CONSTRAINT fk_post_invite
+    FOREIGN KEY (post_invite_id) REFERENCES invite(invite_id) ON DELETE SET NULL;
+
+------------------------------------------------
+-- gp chat
+------------------------------------------------
+
+CREATE TABLE group_post (
+    gp_id         INT AUTO_INCREMENT PRIMARY KEY,
+    gp_evento_id  INT  NOT NULL,
+    gp_usuar_id   INT  NOT NULL,
+    gp_conteudo   TEXT NOT NULL,
+    gp_data_envio DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (gp_evento_id) REFERENCES evento(evento_id) ON DELETE CASCADE,
+    FOREIGN KEY (gp_usuar_id)  REFERENCES usuario(usuar_id) ON DELETE CASCADE
+);
+
+------------------------------------------------
+-- reports
+------------------------------------------------
+
+CREATE TABLE user_report (
+    report_id          INT AUTO_INCREMENT PRIMARY KEY,
+    report_reporter_id INT  NOT NULL,
+    report_reported_id INT  NOT NULL,
+    report_reason      TEXT NOT NULL,
+    report_status      ENUM('pending','reviewed','dismissed') NOT NULL DEFAULT 'pending',
+    report_created_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (report_reporter_id) REFERENCES usuario(usuar_id) ON DELETE CASCADE,
+    FOREIGN KEY (report_reported_id) REFERENCES usuario(usuar_id) ON DELETE CASCADE
+);
+
+------------------------------------------------
+-- admin
+------------------------------------------------
+
+CREATE TABLE admin_log (
+    log_id          INT AUTO_INCREMENT PRIMARY KEY,
+    log_admin_id    INT NOT NULL,
+    log_action      VARCHAR(100),
+    log_target_user INT DEFAULT NULL,
+    log_data        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (log_admin_id) REFERENCES usuario(usuar_id)
+);
+
+------------------------------------------------
+-- SEED DATA
+------------------------------------------------
+
+INSERT INTO interesse (inter_nome) VALUES
+    ('Música'),
+    ('Jogos'),
+    ('Cinema & Séries');
+
+INSERT INTO subinteresse (subinter_inter_id, subinter_nome) VALUES
+    -- Música (id 1)
+    (1, 'Rock'),
+    (1, 'Pop'),
+    (1, 'Hip-Hop'),
+    (1, 'Jazz'),
+    (1, 'Electrónica'),
+    (1, 'Clássica'),
+    (1, 'R&B'),
+    (1, 'Metal'),
+    (1, 'Indie'),
+    (1, 'Reggae'),
+
+    -- Jogos (id 2)
+    (2, 'RPG'),
+    (2, 'FPS'),
+    (2, 'Jogos de Tabuleiro'),
+    (2, 'Estratégia'),
+    (2, 'Aventura'),
+    (2, 'Desporto'),
+    (2, 'Luta'),
+    (2, 'Puzzle'),
+    (2, 'Simulação'),
+    (2, 'Horror'),
+
+    -- Cinema & Séries (id 3)
+    (3, 'Ficção Científica'),
+    (3, 'Terror'),
+    (3, 'Comédia'),
+    (3, 'Drama'),
+    (3, 'Ação'),
+    (3, 'Animação'),
+    (3, 'Documentários'),
+    (3, 'Romance'),
+    (3, 'Thriller'),
+    (3, 'Fantasia');
