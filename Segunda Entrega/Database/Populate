@@ -1,0 +1,200 @@
+-- passwords são todas 123456
+
+USE moodly;
+
+SET FOREIGN_KEY_CHECKS=0;
+TRUNCATE TABLE group_post;
+TRUNCATE TABLE post;
+TRUNCATE TABLE invite;
+TRUNCATE TABLE evento;
+TRUNCATE TABLE pedido_conexao;
+TRUNCATE TABLE usuario_interesse;
+TRUNCATE TABLE subinteresse;
+TRUNCATE TABLE interesse;
+TRUNCATE TABLE user_report;
+TRUNCATE TABLE usuario;
+SET FOREIGN_KEY_CHECKS=1;
+
+INSERT INTO interesse (inter_id, inter_nome) VALUES
+(1, 'Música'),
+(2, 'Jogos'),
+(3, 'Cinema & Séries');
+
+INSERT INTO subinteresse (subinter_id, subinter_inter_id, subinter_nome) VALUES
+-- Música
+(1,  1, 'Bring Me The Horizon'),
+(2,  1, 'Arctic Monkeys'),
+(3,  1, 'Radiohead'),
+(4,  1, 'The Weeknd'),
+(5,  1, 'Billie Eilish'),
+(6,  1, 'Tame Impala'),
+(7,  1, 'Mac DeMarco'),
+(8,  1, 'Tyler the Creator'),
+(9,  1, 'Frank Ocean'),
+(10, 1, 'Kendrick Lamar'),
+(11, 1, 'Doja Cat'),
+(12, 1, 'SZA'),
+(13, 1, 'Lana Del Rey'),
+(14, 1, 'Mitski'),
+(15, 1, 'Clairo'),
+(16, 1, 'Phoebe Bridgers'),
+(17, 1, 'Rex Orange County'),
+(18, 1, 'Omar Apollo'),
+-- Jogos
+(19, 2, 'Hollow Knight'),
+(20, 2, 'Elden Ring'),
+(21, 2, 'Celeste'),
+(22, 2, 'Stardew Valley'),
+(23, 2, 'Hades'),
+(24, 2, 'Disco Elysium'),
+(25, 2, 'The Last of Us'),
+(26, 2, 'God of War'),
+(27, 2, 'Red Dead Redemption 2'),
+(28, 2, 'Minecraft'),
+(29, 2, 'Valorant'),
+(30, 2, 'League of Legends'),
+(31, 2, 'Apex Legends'),
+(32, 2, 'Genshin Impact'),
+(33, 2, 'Persona 5'),
+(34, 2, 'Baldur\'s Gate 3'),
+(35, 2, 'Cyberpunk 2077'),
+(36, 2, 'Dead Cells'),
+-- Cinema & Séries
+(37, 3, 'Succession'),
+(38, 3, 'The Bear'),
+(39, 3, 'Severance'),
+(40, 3, 'Dark'),
+(41, 3, 'Euphoria'),
+(42, 3, 'Peaky Blinders'),
+(43, 3, 'Breaking Bad'),
+(44, 3, 'Better Call Saul'),
+(45, 3, 'The Wire'),
+(46, 3, 'Fleabag'),
+(47, 3, 'Normal People'),
+(48, 3, 'Everything Everywhere All at Once'),
+(49, 3, 'Parasite'),
+(50, 3, 'Interstellar'),
+(51, 3, 'Dune'),
+(52, 3, 'Blade Runner 2049'),
+(53, 3, 'Hereditary'),
+(54, 3, 'The Witch'),
+(55, 3, 'Midsommar'),
+(56, 3, 'Aftersun');
+
+INSERT INTO usuario (usuar_id, usuar_nome, usuar_email, usuar_senha_hash, usuar_role, usuar_foto_perfil) VALUES
+(1,  'Admin',          'admin@moodly.pt',    '$2y$10$xs5hHX7Hhw6cB6ugazfKfu77ey0ODM4DOPminmJjAp0GHlAPq7zza', 'admin', 'uploads/user_1.jpg'),
+(2,  'Deuwer Santos',  'deuwer@moodly.pt',   '$2y$10$xs5hHX7Hhw6cB6ugazfKfu77ey0ODM4DOPminmJjAp0GHlAPq7zza', 'user',  'uploads/user_2.jpg'),
+(3,  'Beatriz Costa',  'beatriz@moodly.pt',  '$2y$10$xs5hHX7Hhw6cB6ugazfKfu77ey0ODM4DOPminmJjAp0GHlAPq7zza', 'user',  'uploads/user_3.jpg'),
+(4,  'Tomás Ferreira', 'tomas@moodly.pt',    '$2y$10$xs5hHX7Hhw6cB6ugazfKfu77ey0ODM4DOPminmJjAp0GHlAPq7zza', 'user',  'uploads/user_4.jpg'),
+(5,  'Inês Rodrigues', 'ines@moodly.pt',     '$2y$10$xs5hHX7Hhw6cB6ugazfKfu77ey0ODM4DOPminmJjAp0GHlAPq7zza', 'user',  'uploads/user_5.jpg'),
+(6,  'Diogo Martins',  'diogo@moodly.pt',    '$2y$10$xs5hHX7Hhw6cB6ugazfKfu77ey0ODM4DOPminmJjAp0GHlAPq7zza', 'user',  'uploads/user_6.jpg'),
+(7,  'Sofia Oliveira', 'sofia@moodly.pt',    '$2y$10$xs5hHX7Hhw6cB6ugazfKfu77ey0ODM4DOPminmJjAp0GHlAPq7zza', 'user',  'uploads/user_7.jpg'),
+(8,  'Rui Pereira',    'rui@moodly.pt',      '$2y$10$xs5hHX7Hhw6cB6ugazfKfu77ey0ODM4DOPminmJjAp0GHlAPq7zza', 'user',  'uploads/user_8.jpg'),
+(9,  'Mariana Nunes',  'mariana@moodly.pt',  '$2y$10$xs5hHX7Hhw6cB6ugazfKfu77ey0ODM4DOPminmJjAp0GHlAPq7zza', 'user',  'uploads/user_9.jpg'),
+(10, 'Ana Silva',      'ana@moodly.pt',      '$2y$10$xs5hHX7Hhw6cB6ugazfKfu77ey0ODM4DOPminmJjAp0GHlAPq7zza', 'user',  'uploads/user_10.jpg');
+
+INSERT INTO usuario_interesse (usint_usuar_id, usint_subinter_id) VALUES
+(1, 1),(1, 2),(1, 19),(1, 20),(1, 37),(1, 40),
+(2, 3),(2, 6),(2, 20),(2, 24),(2, 49),(2, 52),
+(3, 5),(3, 13),(3, 21),(3, 22),(3, 41),(3, 47),
+(4, 8),(4, 10),(4, 29),(4, 31),(4, 45),(4, 43),
+(5, 9),(5, 12),(5, 33),(5, 34),(5, 46),(5, 56),
+(6, 2),(6, 7),(6, 28),(6, 23),(6, 42),(6, 44),
+(7, 14),(7, 16),(7, 21),(7, 36),(7, 39),(7, 38),
+(8, 1),(8, 6),(8, 20),(8, 23),(8, 37),(8, 53),
+(9, 11),(9, 18),(9, 32),(9, 30),(9, 41),(9, 51),
+(10, 2),(10, 9),(10, 19),(10, 22),(10, 40),(10, 46);
+
+INSERT INTO pedido_conexao (pedcon_id, pedcon_usuar_remetente_id, pedcon_usuar_destinatario_id, pedcon_estado) VALUES
+(1,  1, 2,  'aceite'),   -- Admin ↔ Deuwer
+(2,  1, 3,  'aceite'),   -- Admin ↔ Beatriz
+(3,  1, 8,  'aceite'),   -- Admin ↔ Rui
+(4,  2, 4,  'aceite'),   -- Deuwer ↔ Tomás
+(5,  2, 6,  'aceite'),   -- Deuwer ↔ Diogo
+(6,  3, 7,  'aceite'),   -- Beatriz ↔ Sofia
+(7,  3, 5,  'aceite'),   -- Beatriz ↔ Inês
+(8,  4, 8,  'aceite'),   -- Tomás ↔ Rui
+(9,  5, 9,  'aceite'),   -- Inês ↔ Mariana
+(10, 6, 7,  'aceite'),   -- Diogo ↔ Sofia
+(11, 8, 7,  'aceite'),   -- Rui ↔ Sofia
+(12, 9, 4,  'aceite'),   -- Mariana ↔ Tomás
+(13, 1, 10, 'aceite');   -- Admin ↔ Ana
+
+INSERT INTO post (post_connect_id, post_usuar_id, post_conteudo, post_data_envio) VALUES
+(1, 1, 'Já ouviste o novo álbum dos Arctic Monkeys?',          DATE_SUB(NOW(), INTERVAL 120 MINUTE)),
+(1, 2, 'infelizmente',                                         DATE_SUB(NOW(), INTERVAL 115 MINUTE)),
+(1, 1, 'Estou obcecado com ele há semanas',                    DATE_SUB(NOW(), INTERVAL 110 MINUTE)),
+(1, 2, 'que pena',                                             DATE_SUB(NOW(), INTERVAL 105 MINUTE)),
+(1, 1, 'orroh',                                                DATE_SUB(NOW(), INTERVAL 100 MINUTE)),
+
+(6, 3, 'Terminei o Celeste ontem de noite 😭',                 DATE_SUB(NOW(), INTERVAL 200 MINUTE)),
+(6, 7, 'Finalmente',                                           DATE_SUB(NOW(), INTERVAL 195 MINUTE)),
+(6, 3, 'nunca mais toco naquilo',                              DATE_SUB(NOW(), INTERVAL 190 MINUTE)),
+(6, 7, 'nem devias ter jogado em primeiro lugar',              DATE_SUB(NOW(), INTERVAL 185 MINUTE)),
+(6, 3, 'proxima playthrough faço com os pês',                  DATE_SUB(NOW(), INTERVAL 180 MINUTE)),
+
+(8, 4, 'Bro',                                                  DATE_SUB(NOW(), INTERVAL 50 MINUTE)),
+(8, 8, '?',                                                    DATE_SUB(NOW(), INTERVAL 45 MINUTE)),
+(8, 4, 'se pensares, AI significa artificial inteligence, mas se adicionares R no final é AIR, e é o que nós precisamos para respirar', DATE_SUB(NOW(), INTERVAL 40 MINUTE)),
+(8, 8, 'vou apagar essa conecção',                             DATE_SUB(NOW(), INTERVAL 35 MINUTE)),
+(8, 4, 'perdão',                                               DATE_SUB(NOW(), INTERVAL 30 MINUTE)),
+
+(9, 5, 'oieee',                                                DATE_SUB(NOW(), INTERVAL 300 MINUTE)),
+(9, 9, 'oi',                                                   DATE_SUB(NOW(), INTERVAL 290 MINUTE)),
+(9, 5, 'tudo bem :))))',                                       DATE_SUB(NOW(), INTERVAL 280 MINUTE)),
+(9, 9, 'nao',                                                  DATE_SUB(NOW(), INTERVAL 270 MINUTE)),
+
+(13, 1,  'oii ana, tudo bem?', DATE_SUB(NOW(), INTERVAL 90 MINUTE)),
+(13, 10, 'ss',                   DATE_SUB(NOW(), INTERVAL 85 MINUTE)),
+(13, 1,  'reconheco esse nome de algum lugar',                   DATE_SUB(NOW(), INTERVAL 80 MINUTE)),
+(13, 10, 'também reconheço o teu...',           DATE_SUB(NOW(), INTERVAL 75 MINUTE));
+
+
+INSERT INTO evento (evento_id, evento_usuar_id, evento_titulo, evento_descricao, evento_local, evento_lat, evento_lng, evento_data) VALUES
+(1, 1, 'Concerto Arctic Monkeys',  'Concerto no Altice Arena. Vamos todos',   'Altice Arena, Lisboa',      38.7681, -9.0952, '2026-06-14 21:00:00'),
+(2, 2, 'Brawlhalla com os wis',    'vou vos bater TODOS',                     'Casa do Deuwer, Porto',     41.1496, -8.6109, '2026-05-10 20:00:00'),
+(3, 3, 'Ir no cinema ver DUNE',    'Vamos ver o Dune 2. Jantar depois.',       'NOS Colombo, Lisboa',       38.7369, -9.1774, '2026-05-22 19:30:00'),
+(4, 4, 'Ouvir o novo albo juntos', 'Ouvimos o novo Tyler juntos.',             'Café A Brasileira, Lisboa', 38.7121, -9.1424, '2026-05-17 16:00:00'),
+(5, 7, 'Fut com os crias',         'autodescritivo',                           'Casa da Sofia, Lisboa',     38.7223, -9.1393, '2026-05-08 15:00:00');
+
+
+INSERT INTO invite (invite_evento_id, invite_usuar_id, invite_estado) VALUES
+
+(1, 1,  'confirmado'),
+(1, 2,  'confirmado'),
+(1, 8,  'confirmado'),
+(1, 3,  'pendente'),
+
+(2, 2,  'confirmado'),
+(2, 4,  'confirmado'),
+(2, 6,  'pendente'),
+
+(3, 3,  'confirmado'),
+(3, 5,  'confirmado'),
+(3, 7,  'confirmado'),
+(3, 1,  'pendente'),
+
+(4, 4,  'confirmado'),
+(4, 9,  'confirmado'),
+(4, 8,  'pendente'),
+
+(5, 7,  'confirmado'),
+(5, 3,  'confirmado'),
+(5, 6,  'pendente');
+
+
+INSERT INTO group_post (gp_evento_id, gp_usuar_id, gp_conteudo, gp_data_envio) VALUES
+
+(1, 1, 'Alguém pelo amor de deus me da boleia até la',         DATE_SUB(NOW(), INTERVAL 60 MINUTE)),
+(1, 2, 'Eu vou de metro, chego às 20h30',                      DATE_SUB(NOW(), INTERVAL 55 MINUTE)),
+(1, 8, 'vou chegar tipo uns 1i347346817 minutos atrasado',     DATE_SUB(NOW(), INTERVAL 50 MINUTE)),
+(1, 1, 'incrivel...',                                          DATE_SUB(NOW(), INTERVAL 45 MINUTE)),
+
+(2, 2, 'cada um traga o seu comando pelo amor de deus',        DATE_SUB(NOW(), INTERVAL 120 MINUTE)),
+(2, 4, 'tenho xbox :(',                                        DATE_SUB(NOW(), INTERVAL 115 MINUTE)),
+(2, 2, 'tragedia',                                             DATE_SUB(NOW(), INTERVAL 110 MINUTE)),
+
+(3, 3, 'Comprei os bilhetes',                                  DATE_SUB(NOW(), INTERVAL 180 MINUTE)),
+(3, 5, 'bem cedo, todo mundo vai comprar lá.',                 DATE_SUB(NOW(), INTERVAL 175 MINUTE)),
+(3, 7, 'eu acho que nem vou mais',                             DATE_SUB(NOW(), INTERVAL 170 MINUTE)),
+(3, 3, 'maldito seja o homem que confia em outro homem',       DATE_SUB(NOW(), INTERVAL 165 MINUTE));
