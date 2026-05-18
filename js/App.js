@@ -67,7 +67,7 @@ const App = {
     const app  = document.getElementById('app');
     const page = this.state.page;
     const authPages = new Set(['login', 'signup', 'interests', 'photo']);
-    app.className = authPages.has(page) ? 'auth' : '';
+    app.className = authPages.has(page) ? 'auth-page' : '';
 
     const map = {
       login:    () => AuthPages.login(),
@@ -79,6 +79,7 @@ const App = {
       chats:    () => ChatsPage.render(),
       profile:  () => ProfilePage.render(),
       admin:    () => AdminPage.render(),
+      stats:    () => StatsPage.render(),
     };
 
     app.innerHTML = (map[page] || map.home)();

@@ -1,5 +1,5 @@
 <?php
-
+/** @var string $action */
 if ($action === 'get_interests') {
     $db   = db();
     $rows = $db->query("

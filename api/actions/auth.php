@@ -1,5 +1,5 @@
 <?php
-
+/** @var string $action */
 if ($action === 'register') {
     $name  = trim($_POST['name']  ?? '');
     $email = trim($_POST['email'] ?? '');

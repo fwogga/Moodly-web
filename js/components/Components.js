@@ -45,6 +45,7 @@ const Components = {
     ];
     if (App.state.user?.role === 'admin') {
       items.push({ id: 'admin', label: 'Admin' });
+      items.push({ id: 'stats', label: 'Estatísticas' });
     }
     return `
       <aside class="sidebar">

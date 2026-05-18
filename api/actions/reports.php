@@ -1,5 +1,5 @@
 <?php
-
+/** @var string $action */
 if ($action === 'report_user') {
     $userId     = requireLogin();
     $reportedId = (int)($_POST['reportedId'] ?? 0);

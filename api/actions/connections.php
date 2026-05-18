@@ -1,5 +1,5 @@
 <?php
-
+/** @var string $action */
 if ($action === 'get_connections') {
     $userId = requireLogin();
     $db = db();

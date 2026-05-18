@@ -1,5 +1,5 @@
 <?php
-
+/** @var string $action */
 if ($action === 'get_events') {
     $userId = requireLogin();
     $db = db();
@@ -112,4 +112,33 @@ if ($action === 'delete_event') {
     $st->execute([$eventId, $userId]);
     if (!$st->rowCount()) fail('Só é possível apagar eventos cancelados');
     ok();
+}
+
+if ($action === 'get_event_detail') {
+    $userId  = requireLogin();
+    $eventId = (int)($_GET['eventId'] ?? 0);
+    if (!$eventId) fail('eventId em falta');
+    $db = db();
+
+    $st = $db->prepare("
+        SELECT e.*, u.usuar_nome AS organizador, u.usuar_foto_perfil AS organizador_foto
+        FROM evento e
+        JOIN usuario u ON u.usuar_id = e.evento_usuar_id
+        WHERE e.evento_id = ?
+    ");
+    $st->execute([$eventId]);
+    $event = $st->fetch(PDO::FETCH_ASSOC);
+    if (!$event) fail('Evento não encontrado');
+
+    $st = $db->prepare("
+        SELECT u.usuar_id, u.usuar_nome, u.usuar_foto_perfil, i.invite_estado
+        FROM invite i
+        JOIN usuario u ON u.usuar_id = i.invite_usuar_id
+        WHERE i.invite_evento_id = ?
+        ORDER BY FIELD(i.invite_estado,'confirmado','pendente','recusado','cancelado'), u.usuar_nome
+    ");
+    $st->execute([$eventId]);
+    $participants = $st->fetchAll(PDO::FETCH_ASSOC);
+
+    ok(['event' => $event, 'participants' => $participants]);
 }

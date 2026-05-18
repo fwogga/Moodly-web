@@ -1,5 +1,5 @@
 <?php
-
+/** @var string $action */
 if ($action === 'get_chats') {
     $userId = requireLogin();
     $db = db();

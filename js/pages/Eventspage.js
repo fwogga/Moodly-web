@@ -44,12 +44,13 @@ const EventsPage = {
     const isCreator = String(e.evento_usuar_id) === String(App.state.user?.userId);
 
     return `
-      <div class="event-item ${cancelled ? 'cancelled' : ''}">
+      <div class="event-item ${cancelled ? 'cancelled' : ''}"
+           onclick="EventsPage.showDetail(${e.evento_id})" style="cursor:pointer;">
         <div class="event-title">${e.evento_titulo}</div>
         <div class="event-meta">${e.evento_data}</div>
         <div class="event-meta">${e.evento_local || 'Sem local'} · Organizado por ${e.organizador}</div>
         <div class="event-meta">${e.confirmados} confirmados</div>
-        <div class="event-footer">
+        <div class="event-footer" onclick="event.stopPropagation()">
           ${cancelled ? `<span class="badge-cancelled">Cancelado</span>` : ''}
           ${pending   ? `<span class="badge-pending">Convite pendente</span>` : ''}
           ${EventsPage.eventActions(e, cancelled, pending, isCreator)}
@@ -74,6 +75,7 @@ const EventsPage = {
     return btns.join('');
   },
 
+  // ── map picker state ──────────────────────────────────────────
   _pickerMap:    null,
   _pickerMarker: null,
   _pickerLat:    null,
@@ -167,7 +169,7 @@ const EventsPage = {
         const a = data.address;
         input.value = [a.city || a.town || a.village, a.country].filter(Boolean).join(', ');
       }
-    } catch (e) { }
+    } catch (e) { /* user types manually */ }
   },
 
   searchLocation(term) {
@@ -238,6 +240,60 @@ const EventsPage = {
     Components.toast('Evento criado!', 'success');
     App.state.eventsLoaded = false;
     App.navigate('events');
+  },
+
+  async showDetail(eventId) {
+    const res = await App.api('get_event_detail', { eventId }, 'GET');
+    if (!res.ok) { Components.toast(res.error, 'error'); return; }
+
+    const { event: e, participants } = res.data;
+    const confirmed = participants.filter(p => p.invite_estado === 'confirmado');
+    const pending   = participants.filter(p => p.invite_estado === 'pendente');
+    const declined  = participants.filter(p => ['recusado','cancelado'].includes(p.invite_estado));
+
+    const participantRow = (p) => `
+      <div style="display:flex;align-items:center;gap:8px;padding:5px 0;">
+        ${Components.avatar(p.usuar_nome, 30, p.usuar_foto_perfil || '')}
+        <span style="font-size:0.84rem;flex:1;">${p.usuar_nome}</span>
+      </div>`;
+
+    Components.modal(`
+      <h3>${e.evento_titulo}</h3>
+      <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:14px;">
+        <div style="font-size:0.82rem;color:#aaa;">📅 ${e.evento_data}</div>
+        <div style="font-size:0.82rem;color:#aaa;">📍 ${e.evento_local || 'Sem local'}</div>
+        <div style="font-size:0.82rem;color:#aaa;">👤 Organizado por ${e.organizador}</div>
+        ${e.evento_descricao ? `<div style="font-size:0.84rem;margin-top:6px;">${e.evento_descricao}</div>` : ''}
+      </div>
+
+      ${confirmed.length ? `
+        <div style="margin-bottom:12px;">
+          <div style="font-size:0.72rem;color:#4ade80;text-transform:uppercase;font-weight:700;margin-bottom:4px;">
+            Confirmados (${confirmed.length})
+          </div>
+          ${confirmed.map(participantRow).join('')}
+        </div>` : ''}
+
+      ${pending.length ? `
+        <div style="margin-bottom:12px;">
+          <div style="font-size:0.72rem;color:#FFD600;text-transform:uppercase;font-weight:700;margin-bottom:4px;">
+            Pendentes (${pending.length})
+          </div>
+          ${pending.map(participantRow).join('')}
+        </div>` : ''}
+
+      ${declined.length ? `
+        <div style="margin-bottom:12px;">
+          <div style="font-size:0.72rem;color:#f87171;text-transform:uppercase;font-weight:700;margin-bottom:4px;">
+            Recusaram (${declined.length})
+          </div>
+          ${declined.map(participantRow).join('')}
+        </div>` : ''}
+
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="Components.closeModal()">Fechar</button>
+      </div>
+    `);
   },
 
   async accept(eventId) {

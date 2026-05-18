@@ -100,25 +100,51 @@ const InterestInput = {
 const AuthPages = {
 
 login() {
-return `
-<div class="auth-box">
-  <div class="auth-logo">Mood<span>ly</span></div>
-  <h2>Bem-vindo de volta</h2>
-  <p>Entra na tua conta</p>
-  <div class="form-group">
-    <label class="form-label">Email</label>
-    <input class="form-input" type="email" id="l-email" placeholder="email@exemplo.com"
-            onkeydown="if(event.key==='Enter') AuthPages.doLogin()"/>
-  </div>
-  <div class="form-group">
-    <label class="form-label">Senha</label>
-    <input class="form-input" type="password" id="l-pass" placeholder="••••••••"
-            onkeydown="if(event.key==='Enter') AuthPages.doLogin()"/>
-  </div>
-  <div id="l-err" class="error-msg" style="display:none;margin-bottom:10px;"></div>
-  <button class="btn btn-primary btn-full" id="l-btn" onclick="AuthPages.doLogin()">Entrar</button>
-  <div class="auth-switch">Não tens conta? <a onclick="App.navigate('signup')">Cria uma aqui</a></div>
-</div>`;
+  return `
+    <div class="auth-split">
+      <div class="auth-left">
+        <div class="auth-left-logo">
+          <img src="uploads/MoodlyLogo.png" alt="Moodly"/>
+          Mood<span>ly</span>
+        </div>
+        <div class="auth-left-body">
+          <div class="auth-left-tagline">
+            Encontra pessoas com<br/><span>os teus gostos</span>
+          </div>
+          <div class="auth-left-sub">
+            Liga-te a quem ama a mesma música,<br/>filmes e jogos que tu.
+          </div>
+          <div class="auth-pills">
+            <span class="auth-pill">🎮 Jogos</span>
+            <span class="auth-pill">🎬 Filmes</span>
+            <span class="auth-pill">🎵 Música</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="auth-right">
+        <div class="auth-form-wrap">
+          <div class="auth-form-title">Bem-vindo<br/>de volta</div>
+          <div class="auth-form-sub">Entra na tua conta para continuar</div>
+
+          <div class="auth-field">
+            <label>Email</label>
+            <input type="email" id="l-email" placeholder="o.teu@email.com"
+                   onkeydown="if(event.key==='Enter') AuthPages.doLogin()"/>
+          </div>
+          <div class="auth-field">
+            <label>Senha</label>
+            <input type="password" id="l-pass" placeholder="••••••••"
+                   onkeydown="if(event.key==='Enter') AuthPages.doLogin()"/>
+          </div>
+          <div id="l-err" class="auth-err"></div>
+          <button class="auth-btn-primary" id="l-btn" onclick="AuthPages.doLogin()">Entrar</button>
+          <div class="auth-switch-line">
+            Não tens conta? <a onclick="App.navigate('signup')">Cria uma aqui</a>
+          </div>
+        </div>
+      </div>
+    </div>`;
 },
 
   async doLogin() {
@@ -139,27 +165,53 @@ return `
 
   signup() {
     return `
-<div class="auth-box">
-<div class="auth-logo">Mood<span>ly</span></div>
-<h2>Criar conta</h2>
-<p>Junta-te à comunidade Moodly</p>
-<div class="form-group">
-  <label class="form-label">Nome</label>
-  <input class="form-input" type="text" id="s-name" placeholder="O teu nome"/>
-</div>
-<div class="form-group">
-  <label class="form-label">Email</label>
-  <input class="form-input" type="email" id="s-email" placeholder="email@exemplo.com"/>
-</div>
-<div class="form-group">
-  <label class="form-label">Senha</label>
-  <input class="form-input" type="password" id="s-pass" placeholder="••••••••"
-          onkeydown="if(event.key==='Enter') AuthPages.doSignup()"/>
-</div>
-<div id="s-err" class="error-msg" style="display:none;margin-bottom:10px;"></div>
-<button class="btn btn-primary btn-full" id="s-btn" onclick="AuthPages.doSignup()">Criar conta</button>
-<div class="auth-switch">Já tens conta? <a onclick="App.navigate('login')">Inicia sessão</a></div>
-</div>`;
+    <div class="auth-split">
+      <div class="auth-left">
+        <div class="auth-left-logo">
+          <img src="uploads/MoodlyLogo.png" alt="Moodly"/>
+          Mood<span>ly</span>
+        </div>
+        <div class="auth-left-body">
+          <div class="auth-left-tagline">
+            Começa a tua<br/><span>jornada</span>
+          </div>
+          <div class="auth-left-sub">
+            Cria o teu perfil e começa a descobrir pessoas com os mesmos interesses.
+          </div>
+          <div class="auth-pills">
+            <span class="auth-pill">🎮 Jogos</span>
+            <span class="auth-pill">🎬 Filmes</span>
+            <span class="auth-pill">🎵 Música</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="auth-right">
+        <div class="auth-form-wrap">
+          <div class="auth-form-title">Criar conta</div>
+          <div class="auth-form-sub">Junta-te à comunidade Moodly</div>
+
+          <div class="auth-field">
+            <label>Nome</label>
+            <input type="text" id="s-name" placeholder="O teu nome"/>
+          </div>
+          <div class="auth-field">
+            <label>Email</label>
+            <input type="email" id="s-email" placeholder="o.teu@email.com"/>
+          </div>
+          <div class="auth-field">
+            <label>Senha</label>
+            <input type="password" id="s-pass" placeholder="••••••••"
+                   onkeydown="if(event.key==='Enter') AuthPages.doSignup()"/>
+          </div>
+          <div id="s-err" class="auth-err"></div>
+          <button class="auth-btn-primary" id="s-btn" onclick="AuthPages.doSignup()">Criar conta</button>
+          <div class="auth-switch-line">
+            Já tens conta? <a onclick="App.navigate('login')">Inicia sessão</a>
+          </div>
+        </div>
+      </div>
+    </div>`;
   },
 
   async doSignup() {
@@ -175,21 +227,51 @@ return `
     btn.disabled = false; btn.textContent = 'Criar conta';
     if (!res.ok) { errEl.textContent = res.error; errEl.style.display = 'block'; return; }
     App.state.user = res.data;
-    App.state.selectedTags = [];
+    App.state.selectedTags  = [];
+    App.state.chats         = [];
+    App.state.chatsLoaded   = false;
+    App.state.activeChatId   = null;
+    App.state.activeChatName = null;
+    App.state.messages       = [];
+    App.state.activeEventId  = null;
+    App.state.eventMessages  = [];
     App.navigate('interests');
   },
 
   interests() {
     return `
-      <div class="auth-box" style="max-width:500px;">
-        <div class="auth-logo">Mood<span>ly</span></div>
-        <h2>Os teus interesses</h2>
-        <p style="margin-bottom:20px;">Escreve um interesse em cada categoria. Se já existir aparece como sugestão, caso contrário é criado.</p>
-        ${InterestInput.render(App.state.selectedTags, 'InterestInput.remove')}
-        <div id="int-err" class="error-msg" style="display:none;margin:10px 0;"></div>
-        <button class="btn btn-primary btn-full" style="margin-top:8px;" onclick="AuthPages.saveInterests()">Continuar →</button>
-        <div class="auth-switch"><a onclick="App.navigate('photo')">Saltar por agora</a></div>
-      </div>`;
+    <div class="auth-split">
+      <div class="auth-left">
+        <div class="auth-left-logo">
+          <img src="uploads/MoodlyLogo.png" alt="Moodly"/>
+          Mood<span>ly</span>
+        </div>
+        <div class="auth-left-body">
+          <div class="auth-left-tagline">
+            Os teus<br/><span>interesses</span>
+          </div>
+          <div class="auth-left-sub">
+            Quanto mais interesses adicionares, mais pessoas compatíveis vais descobrir.
+          </div>
+          <div class="auth-pills">
+            <span class="auth-pill">🎮 Jogos</span>
+            <span class="auth-pill">🎬 Cinema & Séries</span>
+            <span class="auth-pill">🎵 Música</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="auth-right">
+        <div class="auth-form-wrap" style="max-width:460px;">
+          <div class="auth-form-title">Os teus gostos</div>
+          <div class="auth-form-sub">Escreve e carrega Enter para adicionar. Se já existir aparece como sugestão.</div>
+          ${InterestInput.render(App.state.selectedTags, 'InterestInput.remove')}
+          <div id="int-err" class="auth-err"></div>
+          <button class="auth-btn-primary" style="margin-top:16px;" onclick="AuthPages.saveInterests()">Continuar →</button>
+          <button class="auth-btn-outline" onclick="App.navigate('photo')">Saltar por agora</button>
+        </div>
+      </div>
+    </div>`;
   },
 
   async saveInterests() {
@@ -206,23 +288,43 @@ return `
 
   photoStep() {
     return `
-<div class="auth-box">
-<div class="auth-logo">Mood<span>ly</span></div>
-<h2>Foto de perfil</h2>
-<p>Opcional. Podes adicionar ou alterar mais tarde.</p>
-<div style="text-align:center;margin-bottom:16px;">
-<div id="photo-preview" style="width:90px;height:90px;border-radius:50%;background:#444;display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:700;margin:0 auto 12px;overflow:hidden;">
-  ${(App.state.user?.name || '?')[0].toUpperCase()}
-</div>
-<label class="btn btn-outline" style="cursor:pointer;">
-  Escolher foto
-  <input type="file" accept="image/*" style="display:none" onchange="AuthPages.previewPhoto(this)"/>
-</label>
-</div>
-<div id="photo-err" class="error-msg" style="display:none;margin-bottom:10px;"></div>
-<button class="btn btn-primary btn-full" id="photo-btn" onclick="AuthPages.uploadPhoto()">Guardar e entrar</button>
-<div class="auth-switch"><a onclick="App.navigate('home')">Saltar</a></div>
-</div>`;
+    <div class="auth-split">
+      <div class="auth-left">
+        <div class="auth-left-logo">
+          <img src="uploads/MoodlyLogo.png" alt="Moodly"/>
+          Mood<span>ly</span>
+        </div>
+        <div class="auth-left-body">
+          <div class="auth-left-tagline">
+            A tua<br/><span>cara</span>
+          </div>
+          <div class="auth-left-sub">
+            Uma foto ajuda as pessoas a reconhecer-te. Podes adicionar ou alterar mais tarde.
+          </div>
+        </div>
+      </div>
+
+      <div class="auth-right">
+        <div class="auth-form-wrap">
+          <div class="auth-form-title">Foto de perfil</div>
+          <div class="auth-form-sub">Opcional — podes saltar e adicionar mais tarde.</div>
+
+          <div class="auth-avatar-wrap">
+            <div id="photo-preview" class="auth-avatar-circle">
+              ${(App.state.user?.name || '?')[0].toUpperCase()}
+            </div>
+            <label class="auth-btn-outline" style="width:auto;padding:9px 24px;cursor:pointer;display:inline-block;text-align:center;">
+              Escolher foto
+              <input type="file" accept="image/*" style="display:none" onchange="AuthPages.previewPhoto(this)"/>
+            </label>
+          </div>
+
+          <div id="photo-err" class="auth-err"></div>
+          <button class="auth-btn-primary" id="photo-btn" onclick="AuthPages.uploadPhoto()">Guardar e entrar</button>
+          <button class="auth-btn-outline" onclick="App.navigate('home')">Saltar</button>
+        </div>
+      </div>
+    </div>`;
   },
 
   previewPhoto(input) {

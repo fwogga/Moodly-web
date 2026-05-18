@@ -1,5 +1,5 @@
 <?php
-
+/** @var string $action */
 if ($action === 'discover') {
     $userId = requireLogin();
     $db = db();
