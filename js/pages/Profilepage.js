@@ -15,60 +15,53 @@ const ProfilePage = {
 
     return Components.shell(`
       <div class="page-header">
-        <div><h1>Perfil</h1></div>
-        <div style="display:flex;gap:8px;">
-          <button class="btn btn-outline btn-sm" onclick="ProfilePage.showEdit()">Editar</button>
-          <button class="btn btn-outline btn-sm" onclick="App.logout()">Sair</button>
-        </div>
+        <div><h1>Perfil</h1><p>Gere as tuas informações</p></div>
+        <button class="btn btn-outline btn-sm" onclick="App.logout()">Sair</button>
       </div>
 
       <div class="profile-grid">
 
-        <div class="profile-card">
-          <div class="profile-avatar-big">
-            ${u.usuar_foto_perfil
-              ? `<img src="${u.usuar_foto_perfil}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"/>`
-              : `<span style="font-size:2rem;">${(u.usuar_nome||'?')[0].toUpperCase()}</span>`
-            }
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div class="card" style="text-align:center;padding:0;overflow:hidden;">
+            <div style="height:80px;background:linear-gradient(135deg,#4c0090,#1a0040);"></div>
+            <div style="padding:0 20px 20px;">
+              <div class="profile-avatar-big">
+                ${u.usuar_foto_perfil
+                  ? `<img src="${u.usuar_foto_perfil}"/>`
+                  : `<span>${(u.usuar_nome||'?')[0].toUpperCase()}</span>`
+                }
+              </div>
+              <div class="profile-name">${u.usuar_nome}</div>
+              <div style="display:flex;justify-content:center;gap:28px;padding:12px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:16px;">
+                <div style="text-align:center;">
+                  <div style="font-size:1.2rem;font-weight:800;color:#fff;">${u.connection_count}</div>
+                  <div style="font-size:0.68rem;color:var(--dim);text-transform:uppercase;letter-spacing:0.4px;">Conexões</div>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:8px;">
+                <label style="display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:8px;padding:9px;font-size:0.86rem;font-weight:600;transition:background 0.15s;">
+                  Alterar foto
+                  <input type="file" accept="image/*" style="display:none" onchange="ProfilePage.uploadPhoto(this)"/>
+                </label>
+                <button onclick="ProfilePage.showEdit()" style="background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:8px;padding:9px;font-size:0.86rem;font-weight:600;">Editar nome</button>
+                <button onclick="ProfilePage.showEditInterests()" style="background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:8px;padding:9px;font-size:0.86rem;font-weight:600;">Editar interesses</button>
+              </div>
+            </div>
           </div>
-          <div class="profile-name">${u.usuar_nome}</div>
-          <div style="display:flex;justify-content:space-between;margin-bottom:14px;">
-            <span style="color:#777;">Conexões</span>
-            <span>${u.connection_count}</span>
-          </div>
-          <label class="btn btn-outline btn-full" style="cursor:pointer;">
-            Alterar foto
-            <input type="file" accept="image/*" style="display:none" onchange="ProfilePage.uploadPhoto(this)"/>
-          </label>
         </div>
 
         <div>
-          <div class="card">
+          <div class="card" style="margin-bottom:14px;">
             <div class="card-title">Interesses</div>
             ${Components.interestCategories(u.interests || [])}
-            <button class="btn btn-outline btn-sm" style="margin-top:12px;"
-                    onclick="ProfilePage.showEditInterests()">Editar interesses</button>
-          </div>
-
-          <div class="card">
-            <div class="card-title">Conexões (${App.state.connections.length})</div>
-            ${App.state.connections.map(c => `
-              <div class="conn-item">
-                ${Components.avatar(c.usuar_nome, 32, c.usuar_foto_perfil || '')}
-                <div class="conn-name">${c.usuar_nome}</div>
-              </div>
-            `).join('')}
-            ${!App.state.connections.length
-              ? `<span style="color:var(--dim);font-size:0.84rem;">Sem conexões ainda</span>`
-              : ''}
           </div>
 
           ${App.state.pendingRequests.length ? `
-            <div class="card">
-              <div class="card-title">Pedidos recebidos (${App.state.pendingRequests.length})</div>
+            <div class="card" style="border-color:rgba(255,214,0,0.25);margin-bottom:14px;">
+              <div class="card-title" style="color:var(--yellow);">Pedidos recebidos (${App.state.pendingRequests.length})</div>
               ${App.state.pendingRequests.map(r => `
                 <div class="conn-item">
-                  ${Components.avatar(r.usuar_nome, 32)}
+                  ${Components.avatar(r.usuar_nome, 34)}
                   <div class="conn-name">${r.usuar_nome}</div>
                   <div class="conn-actions">
                     <button class="btn btn-sm btn-primary" onclick="ProfilePage.accept(${r.request_id})">Aceitar</button>
@@ -78,6 +71,19 @@ const ProfilePage = {
               `).join('')}
             </div>
           ` : ''}
+
+          <div class="card">
+            <div class="card-title">Conexões (${App.state.connections.length})</div>
+            ${App.state.connections.map(c => `
+              <div class="conn-item">
+                ${Components.avatar(c.usuar_nome, 34, c.usuar_foto_perfil || '')}
+                <div class="conn-name">${c.usuar_nome}</div>
+              </div>
+            `).join('')}
+            ${!App.state.connections.length
+              ? `<span style="color:var(--dim);font-size:0.84rem;">Sem conexões ainda</span>`
+              : ''}
+          </div>
         </div>
 
       </div>

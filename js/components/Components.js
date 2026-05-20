@@ -49,7 +49,7 @@ const Components = {
     }
     return `
       <aside class="sidebar">
-        <div class="sidebar-logo"><img src="uploads/MoodlyLogo.png" alt="Moodly" class="logo-img"/>Moodly</span></div>
+        <div class="sidebar-logo"><img src="uploads/MoodlyLogo.png" alt="Moodly" class="logo-img"/>Mood<span style="color:var(--yellow)">ly</span></div>
         <nav class="nav">
           ${items.map(item => `
             <div class="nav-item ${activePage === item.id ? 'active' : ''}"

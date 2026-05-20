@@ -3,54 +3,89 @@ const StatsPage = {
   render() {
     const html = Components.shell(`
       <div class="page-header">
-        <div><h1>Estatísticas</h1><p>Análise descritiva da plataforma</p></div>
+        <div><h1>Estatísticas</h1><p>Painel de análise para decisões sobre a plataforma</p></div>
       </div>
 
-      <div id="stats-summary" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:24px;">
-        <div style="color:#777;font-size:0.82rem;">A carregar...</div>
+      <div id="stats-kpis" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:28px;">
+        <div style="color:var(--dim);font-size:0.82rem;">A carregar...</div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;">
+        <div class="card">
+          <div class="card-title">Análise descritiva — conexões por utilizador</div>
+          <div id="desc-connections"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Análise descritiva — mensagens e eventos</div>
+          <div id="desc-other"></div>
+        </div>
       </div>
 
       <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-bottom:20px;">
         <div class="card">
-          <div class="card-title">Mensagens enviadas — últimos 14 dias</div>
+          <div class="card-title">Atividade de mensagens — últimos 14 dias</div>
           <div style="position:relative;height:200px;"><canvas id="chart-activity"></canvas></div>
+          <div id="activity-insight" style="margin-top:10px;font-size:0.78rem;color:var(--dim);"></div>
         </div>
         <div class="card">
-          <div class="card-title">Distribuição por categoria</div>
+          <div class="card-title">Interesses por categoria</div>
           <div style="position:relative;height:200px;"><canvas id="chart-category"></canvas></div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:8px;font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--dim);">Interesses</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;">
+        <div class="card">
+          <div class="card-title">Mais populares (nº de utilizadores)</div>
+          <div style="position:relative;height:280px;"><canvas id="chart-popular"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Que mais uniram pessoas (conexões geradas)</div>
+          <div style="position:relative;height:280px;"><canvas id="chart-uniting"></canvas></div>
         </div>
       </div>
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;">
         <div class="card">
-          <div class="card-title">Interesses mais populares</div>
-          <div style="position:relative;height:320px;"><canvas id="chart-popular"></canvas></div>
+          <div class="card-title">Histograma — distribuição de conexões por utilizador</div>
+          <div style="position:relative;height:200px;"><canvas id="chart-hist-conn"></canvas></div>
+          <div id="hist-conn-insight" style="margin-top:10px;font-size:0.78rem;color:var(--dim);"></div>
         </div>
         <div class="card">
-          <div class="card-title">Interesses que mais uniram pessoas</div>
-          <div style="position:relative;height:320px;"><canvas id="chart-uniting"></canvas></div>
+          <div class="card-title">Histograma — mensagens por conversa</div>
+          <div style="position:relative;height:200px;"><canvas id="chart-hist-msg"></canvas></div>
+          <div id="hist-msg-insight" style="margin-top:10px;font-size:0.78rem;color:var(--dim);"></div>
         </div>
       </div>
 
+      <div style="margin-bottom:8px;font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--dim);">Eventos & Chats</div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-bottom:20px;">
         <div class="card">
           <div class="card-title">Estado dos convites de eventos</div>
-          <div style="position:relative;height:220px;"><canvas id="chart-events"></canvas></div>
+          <div style="position:relative;height:200px;"><canvas id="chart-events"></canvas></div>
         </div>
         <div class="card">
           <div class="card-title">Estado dos pedidos de conexão</div>
-          <div style="position:relative;height:220px;"><canvas id="chart-connections"></canvas></div>
+          <div style="position:relative;height:200px;"><canvas id="chart-connections"></canvas></div>
         </div>
         <div class="card">
           <div class="card-title">Top 5 utilizadores mais conectados</div>
-          <div id="top-users" style="display:flex;flex-direction:column;gap:8px;margin-top:8px;">
-            <span style="color:#777;font-size:0.82rem;">A carregar...</span>
+          <div id="top-users" style="display:flex;flex-direction:column;gap:8px;margin-top:4px;">
+            <span style="color:var(--dim);font-size:0.82rem;">A carregar...</span>
           </div>
         </div>
       </div>
 
-      <div id="descriptive-section" style="margin-bottom:20px;">
-        <div style="color:#777;font-size:0.82rem;">A carregar análise descritiva...</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;">
+        <div class="card">
+          <div class="card-title">Correlação: interesses vs conexões</div>
+          <div style="position:relative;height:220px;"><canvas id="chart-correlation"></canvas></div>
+          <div id="corr-insight" style="margin-top:10px;font-size:0.78rem;color:var(--dim);"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Interesse mais polarizador</div>
+          <div id="polarizador-block" style="margin-top:4px;"></div>
+        </div>
       </div>
 
     `, 'stats');
@@ -74,7 +109,8 @@ const StatsPage = {
       App.api('stats_descriptive',           {}, 'GET'),
     ]);
 
-    if (globalRes.ok) StatsPage._renderSummary(globalRes.data, actRes.ok ? actRes.data : [], popRes.ok ? popRes.data : []);
+    if (globalRes.ok) StatsPage._renderKPIs(globalRes.data, actRes.ok ? actRes.data : []);
+    if (descRes.ok)   StatsPage._renderDescriptive(descRes.data);
     if (actRes.ok)    StatsPage._drawActivity(actRes.data);
     if (catRes.ok)    StatsPage._drawCategory(catRes.data);
     if (popRes.ok)    StatsPage._drawPopular(popRes.data);
@@ -82,52 +118,199 @@ const StatsPage = {
     if (evRes.ok)     StatsPage._drawEventParticipation(evRes.data);
     if (connRes.ok)   StatsPage._drawConnections(connRes.data);
     if (topRes.ok)    StatsPage._renderTopUsers(topRes.data);
-    if (descRes.ok)   StatsPage._renderDescriptive(descRes.data);
+    if (descRes.ok)   StatsPage._drawCorrelation(descRes.data);
+    if (descRes.ok)   StatsPage._renderPolarizador(descRes.data);
+    if (descRes.ok)   StatsPage._drawHistograms(descRes.data);
   },
 
-  _renderSummary(g, actData, popData) {
-    const el = document.getElementById('stats-summary');
+  _renderKPIs(g, actData) {
+    const el = document.getElementById('stats-kpis');
     if (!el) return;
-
-
     const totalMsgs14 = actData.reduce((s, d) => s + d.mensagens, 0);
-    const avgMsgs = actData.length ? (totalMsgs14 / actData.length).toFixed(1) : 0;
-    const maxDay  = actData.reduce((m, d) => d.mensagens > m.mensagens ? d : m, { dia: '—', mensagens: 0 });
-    const topInterest = popData.length ? popData[0].nome : '—';
-
-    const cards = [
-      { label: 'Utilizadores',          value: g.users },
-      { label: 'Banidos',               value: g.banned },
-      { label: 'Conexões aceites',       value: g.connections },
-      { label: 'Eventos',               value: g.events },
-      { label: 'Mensagens totais',       value: g.messages },
-      { label: 'Reports pendentes',      value: g.reports },
-      { label: 'Msgs (14 dias)',         value: totalMsgs14 },
-      { label: 'Média msgs/dia',         value: avgMsgs },
-      { label: 'Dia mais ativo',         value: maxDay.dia.slice(5) + ' (' + maxDay.mensagens + ')' },
-      { label: 'Interesse top',          value: topInterest },
+    const maxDay = actData.reduce((m, d) => d.mensagens > m.mensagens ? d : m, { dia: '—', mensagens: 0 });
+    const items = [
+      { n: g.users,       l: 'Utilizadores' },
+      { n: g.connections, l: 'Conexões aceites' },
+      { n: g.events,      l: 'Eventos' },
+      { n: g.messages,    l: 'Mensagens totais' },
+      { n: totalMsgs14,   l: 'Msgs (14 dias)' },
+      { n: maxDay.mensagens + ' (' + (maxDay.dia.slice(5) || '—') + ')', l: 'Dia mais ativo' },
+      { n: g.reports,     l: 'Reports pendentes', warn: g.reports > 0 },
+      { n: g.banned,      l: 'Banidos',           warn: g.banned > 0 },
     ];
+    el.innerHTML = items.map(i => `
+      <div class="stat-box" style="flex:1;min-width:110px;">
+        <div class="stat-box-num" style="${i.warn ? 'color:var(--red)' : ''}">${i.n}</div>
+        <div class="stat-box-lbl">${i.l}</div>
+      </div>`).join('');
+  },
 
-    el.innerHTML = cards.map(c => `
-      <div class="stat-box" style="flex:1;min-width:120px;">
-        <div class="stat-box-num" style="font-size:1.1rem;">${c.value}</div>
-        <div class="stat-box-lbl">${c.label}</div>
+  _row(label, value, note = '', warn = false) {
+    return `<div style="display:flex;justify-content:space-between;align-items:baseline;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+      <span style="font-size:0.83rem;color:var(--dim);">${label}</span>
+      <span style="font-size:0.9rem;font-weight:700;color:${warn ? 'var(--red)' : 'var(--yellow)'};">${value}${note ? `<span style="font-size:0.7rem;font-weight:400;color:var(--dim2);margin-left:5px;">${note}</span>` : ''}</span>
+    </div>`;
+  },
+
+  _renderDescriptive(d) {
+    const c = d.conexoes;
+    const m = d.mensagens;
+    const ev = d.eventos;
+
+    const ci95 = (mean, std, n) => {
+      if (n < 2) return '—';
+      const se = std / Math.sqrt(n);
+      return `[${(mean - 1.96 * se).toFixed(2)}, ${(mean + 1.96 * se).toFixed(2)}]`;
+    };
+
+    const connEl = document.getElementById('desc-connections');
+    if (connEl) connEl.innerHTML = [
+      StatsPage._row('Média',          c.media),
+      StatsPage._row('Mediana',        c.mediana),
+      StatsPage._row('Moda',           c.moda ?? '—'),
+      StatsPage._row('Desvio padrão',  c.desvio, 'dispersão'),
+      StatsPage._row('Mínimo / Máximo', `${c.min} / ${c.max}`),
+      StatsPage._row('P25 / P75',      `${c.p25 ?? '—'} / ${c.p75 ?? '—'}`, 'percentis'),
+      StatsPage._row('IC 95% da média', ci95(c.media, c.desvio, c.n ?? 10), ''),
+      `<div style="margin-top:10px;font-size:0.75rem;color:var(--dim2);line-height:1.6;">
+        ${c.desvio > c.media ? 'Desvio padrão elevado — distribuição assimétrica. Alguns utilizadores têm muito mais conexões que a maioria.' : 'Distribuição relativamente homogénea entre utilizadores.'}
+      </div>`,
+    ].join('');
+
+    const otherEl = document.getElementById('desc-other');
+    if (otherEl) otherEl.innerHTML = [
+      `<div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;color:var(--dim);letter-spacing:0.5px;margin-bottom:8px;">Mensagens por conversa</div>`,
+      StatsPage._row('Média',             m.media_por_conversa.toFixed(1)),
+      StatsPage._row('Conversa mais ativa', m.max_numa_conversa + ' mensagens'),
+      StatsPage._row('Conversas sem msgs', m.conversas_sem_msgs, 'nunca falaram', m.conversas_sem_msgs > 0),
+      `<div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;color:var(--dim);letter-spacing:0.5px;margin:14px 0 8px;">Eventos</div>`,
+      StatsPage._row('Média participantes', ev.media_participantes.toFixed(1)),
+      StatsPage._row('Mais concorrido',    ev.max_participantes + ' pessoas'),
+      StatsPage._row('Menos concorrido',   ev.min_participantes + ' pessoas'),
+      d.interesses_por_categoria.map(r =>
+        `<div style="margin-top:12px;font-size:0.7rem;font-weight:700;text-transform:uppercase;color:var(--dim);letter-spacing:0.5px;margin-bottom:6px;">${r.categoria}</div>` +
+        StatsPage._row('Média interesses/user', r.media)
+      ).join(''),
+    ].join('');
+  },
+
+  _drawCorrelation(d) {
+    const el = document.getElementById('chart-correlation');
+    if (!el || !d.bivariada) return;
+    const labels = d.bivariada.map(r => r.grupo + ' int.');
+    const values = d.bivariada.map(r => parseFloat(r.media_conexoes));
+    new Chart(el, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Média de conexões',
+          data: values,
+          backgroundColor: values.map((v, i) => `rgba(124,58,237,${0.4 + i * 0.15})`),
+          borderRadius: 6,
+          borderSkipped: false,
+        }],
+      },
+      options: {
+        ...StatsPage._base(),
+        plugins: {
+          ...StatsPage._base().plugins,
+          legend: { display: false },
+          tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.y.toFixed(1)} conexões médias` } },
+        },
+      },
+    });
+
+    const corrEl = document.getElementById('corr-insight');
+    if (corrEl && d.bivariada.length > 1) {
+      const first = parseFloat(d.bivariada[0]?.media_conexoes || 0);
+      const last  = parseFloat(d.bivariada[d.bivariada.length - 1]?.media_conexoes || 0);
+      corrEl.textContent = last > first
+        ? `Correlação positiva — utilizadores com mais interesses tendem a ter mais conexões.`
+        : `Correlação não clara — mais interesses não implica necessariamente mais conexões.`;
+    }
+  },
+
+  _renderPolarizador(d) {
+    const el = document.getElementById('polarizador-block');
+    if (!el || !d.polarizador) { if (el) el.innerHTML = `<span style="color:var(--dim)">Sem dados suficientes</span>`; return; }
+    const p = d.polarizador;
+    const taxa = p.utilizadores > 0 ? ((p.conexoes / p.utilizadores) * 100).toFixed(0) : 0;
+    el.innerHTML = `
+      <div style="background:rgba(255,214,0,0.06);border:1px solid rgba(255,214,0,0.2);border-radius:10px;padding:14px;margin-bottom:12px;">
+        <div style="font-size:1rem;font-weight:800;color:#fff;margin-bottom:4px;">${p.nome}</div>
+        <div style="font-size:0.78rem;color:var(--dim);">${p.categoria}</div>
       </div>
-    `).join('');
+      ${StatsPage._row('Utilizadores com este interesse', p.utilizadores)}
+      ${StatsPage._row('Conexões que partilham este interesse', p.conexoes)}
+      ${StatsPage._row('Taxa de conversão', taxa + '%', 'utilizadores → conexão')}
+      <div style="margin-top:12px;font-size:0.78rem;color:var(--dim2);line-height:1.6;">
+        Este interesse é popular mas converte poucas conexões — pode indicar que os utilizadores têm gostos em comum mas não se conectam. Considera destacá-lo no algoritmo de descoberta.
+      </div>`;
+  },
+
+  _drawHistograms(d) {
+    const connValues = d._raw_conn_values || [];
+    const msgValues  = d._raw_msg_values  || [];
+
+    const buildHist = (values, bins) => {
+      if (!values.length) return { labels: [], counts: [] };
+      const min = Math.min(...values), max = Math.max(...values);
+      const step = Math.max(1, Math.ceil((max - min + 1) / bins));
+      const labels = [], counts = [];
+      for (let i = min; i <= max; i += step) {
+        labels.push(`${i}${step > 1 ? '–' + (i + step - 1) : ''}`);
+        counts.push(values.filter(v => v >= i && v < i + step).length);
+      }
+      return { labels, counts };
+    };
+
+    const histConn = buildHist(connValues, 6);
+    const elConn = document.getElementById('chart-hist-conn');
+    if (elConn && histConn.labels.length) {
+      new Chart(elConn, {
+        type: 'bar',
+        data: {
+          labels: histConn.labels,
+          datasets: [{ label: 'Utilizadores', data: histConn.counts, backgroundColor: 'rgba(124,58,237,0.7)', borderRadius: 4, borderSkipped: false }],
+        },
+        options: { ...StatsPage._base(), plugins: { ...StatsPage._base().plugins, legend: { display: false } }, scales: { ...StatsPage._base().scales, y: { ...StatsPage._base().scales.y, ticks: { ...StatsPage._base().scales.y.ticks, precision: 0 } } } },
+      });
+    }
+    const hcEl = document.getElementById('hist-conn-insight');
+    if (hcEl && d.conexoes) {
+      hcEl.textContent = `Média: ${d.conexoes.media} · Mediana: ${d.conexoes.mediana} · σ: ${d.conexoes.desvio}`;
+    }
+
+    const histMsg = buildHist(msgValues, 5);
+    const elMsg = document.getElementById('chart-hist-msg');
+    if (elMsg && histMsg.labels.length) {
+      new Chart(elMsg, {
+        type: 'bar',
+        data: {
+          labels: histMsg.labels,
+          datasets: [{ label: 'Conversas', data: histMsg.counts, backgroundColor: 'rgba(255,214,0,0.6)', borderRadius: 4, borderSkipped: false }],
+        },
+        options: { ...StatsPage._base(), plugins: { ...StatsPage._base().plugins, legend: { display: false } }, scales: { ...StatsPage._base().scales, y: { ...StatsPage._base().scales.y, ticks: { ...StatsPage._base().scales.y.ticks, precision: 0 } } } },
+      });
+    }
+    const hmEl = document.getElementById('hist-msg-insight');
+    if (hmEl && d.mensagens) {
+      hmEl.textContent = `Média: ${d.mensagens.media_por_conversa.toFixed(1)} msgs/conversa · Máx: ${d.mensagens.max_numa_conversa}`;
+    }
   },
 
   _renderTopUsers(data) {
     const el = document.getElementById('top-users');
     if (!el) return;
-    if (!data.length) { el.innerHTML = `<span style="color:#777;font-size:0.82rem;">Sem dados</span>`; return; }
+    if (!data.length) { el.innerHTML = `<span style="color:var(--dim)">Sem dados</span>`; return; }
     el.innerHTML = data.map((u, i) => `
       <div style="display:flex;align-items:center;gap:8px;">
-        <span style="color:#777;font-size:0.8rem;width:16px;">${i + 1}.</span>
-        ${Components.avatar(u.nome, 28, u.foto || '')}
-        <div style="flex:1;font-size:0.82rem;">${u.nome}</div>
-        <span style="font-size:0.78rem;color:#FFD600;">${u.conexoes} conexões</span>
-      </div>
-    `).join('');
+        <span style="color:var(--dim);font-size:0.78rem;width:18px;text-align:right;">${i + 1}</span>
+        ${Components.avatar(u.nome, 30, u.foto || '')}
+        <div style="flex:1;font-size:0.84rem;font-weight:600;">${u.nome}</div>
+        <span style="font-size:0.78rem;color:var(--yellow);font-weight:700;">${u.conexoes}</span>
+      </div>`).join('');
   },
 
   _loadChartJs() {
@@ -146,44 +329,42 @@ const StatsPage = {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
-        legend: { labels: { color: '#cccccc', font: { family: 'Arial', size: 11 }, boxWidth: 12 } },
+        legend: { labels: { color: 'rgba(255,255,255,0.6)', font: { family: 'Inter', size: 11 }, boxWidth: 12 } },
       },
       scales: {
-        x: { ticks: { color: '#999', font: { size: 10 } }, grid: { color: '#2a2a2a' } },
-        y: { ticks: { color: '#999', font: { size: 10 } }, grid: { color: '#2a2a2a' }, beginAtZero: true },
+        x: { ticks: { color: 'rgba(255,255,255,0.4)', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.05)' } },
+        y: { ticks: { color: 'rgba(255,255,255,0.4)', font: { size: 10 }, precision: 0 }, grid: { color: 'rgba(255,255,255,0.05)' }, beginAtZero: true },
       },
     };
   },
 
-  _catColor(cat, alpha = 0.85) {
-    const map = {
-      'Música':          `rgba(139,92,246,${alpha})`,
-      'Jogos':           `rgba(34,197,94,${alpha})`,
-      'Cinema & Séries': `rgba(59,130,246,${alpha})`,
-    };
-    return map[cat] || `rgba(255,214,0,${alpha})`;
+  _catColor(cat) {
+    const map = { 'Música': 'rgba(139,92,246,0.8)', 'Jogos': 'rgba(34,197,94,0.8)', 'Cinema & Séries': 'rgba(59,130,246,0.8)' };
+    return map[cat] || 'rgba(255,214,0,0.8)';
   },
 
   _drawActivity(data) {
     const el = document.getElementById('chart-activity');
     if (!el) return;
+    const values = data.map(d => d.mensagens);
+    const avg = values.reduce((a,b) => a+b, 0) / values.length;
     new Chart(el, {
       type: 'line',
       data: {
         labels: data.map(d => d.dia.slice(5)),
-        datasets: [{
-          label: 'Mensagens',
-          data: data.map(d => d.mensagens),
-          borderColor: '#FFD600',
-          backgroundColor: 'rgba(255,214,0,0.10)',
-          borderWidth: 2,
-          pointRadius: 3,
-          fill: true,
-          tension: 0.3,
-        }],
+        datasets: [
+          { label: 'Mensagens', data: values, borderColor: '#FFD600', backgroundColor: 'rgba(255,214,0,0.08)', borderWidth: 2, pointRadius: 3, fill: true, tension: 0.3 },
+          { label: 'Média', data: values.map(() => Math.round(avg)), borderColor: 'rgba(255,255,255,0.25)', borderDash: [4,4], borderWidth: 1, pointRadius: 0, fill: false },
+        ],
       },
-      options: { ...StatsPage._base(), plugins: { ...StatsPage._base().plugins, legend: { display: false } } },
+      options: { ...StatsPage._base(), scales: { ...StatsPage._base().scales, y: { ...StatsPage._base().scales.y, ticks: { ...StatsPage._base().scales.y.ticks, precision: 0 } } } },
     });
+    const insEl = document.getElementById('activity-insight');
+    if (insEl) {
+      const max = Math.max(...values);
+      const trend = values[values.length-1] > values[0] ? 'tendência crescente' : 'tendência decrescente';
+      insEl.textContent = `Média: ${Math.round(avg)} msgs/dia · Pico: ${max} · ${trend} nos últimos 14 dias`;
+    }
   },
 
   _drawCategory(data) {
@@ -193,20 +374,9 @@ const StatsPage = {
       type: 'doughnut',
       data: {
         labels: data.map(d => d.categoria),
-        datasets: [{
-          data: data.map(d => d.total),
-          backgroundColor: data.map(d => StatsPage._catColor(d.categoria)),
-          borderWidth: 0,
-        }],
+        datasets: [{ data: data.map(d => d.total), backgroundColor: data.map(d => StatsPage._catColor(d.categoria)), borderWidth: 0 }],
       },
-      options: {
-        animation: false,
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { position: 'bottom', labels: { color: '#ccc', font: { size: 11 }, boxWidth: 12 } },
-        },
-      },
+      options: { animation: false, responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: 'rgba(255,255,255,0.6)', font: { size: 11 }, boxWidth: 12 } } } },
     });
   },
 
@@ -217,29 +387,9 @@ const StatsPage = {
       type: 'bar',
       data: {
         labels: data.map(d => d.nome),
-        datasets: [{
-          label: 'Utilizadores',
-          data: data.map(d => d.total),
-          backgroundColor: data.map(d => StatsPage._catColor(d.categoria)),
-          borderRadius: 3,
-        }],
+        datasets: [{ data: data.map(d => d.total), backgroundColor: data.map(d => StatsPage._catColor(d.categoria)), borderRadius: 3 }],
       },
-      options: {
-        ...StatsPage._base(),
-        indexAxis: 'y',
-        plugins: {
-          ...StatsPage._base().plugins,
-          legend: { display: false },
-          tooltip: { callbacks: {
-            label: ctx => ` ${ctx.parsed.x} utilizadores`,
-            afterLabel: ctx => `  ${data[ctx.dataIndex].categoria}`,
-          }},
-        },
-        scales: {
-          x: { ticks: { color: '#999', font: { size: 10 } }, grid: { color: '#2a2a2a' } },
-          y: { ticks: { color: '#ccc', font: { size: 10 } }, grid: { color: '#2a2a2a' } },
-        },
-      },
+      options: { ...StatsPage._base(), indexAxis: 'y', plugins: { ...StatsPage._base().plugins, legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.x} utilizadores`, afterLabel: ctx => `  ${data[ctx.dataIndex].categoria}` } } }, scales: { x: { ...StatsPage._base().scales.x, ticks: { ...StatsPage._base().scales.x.ticks, precision: 0 } }, y: { ticks: { color: 'rgba(255,255,255,0.5)', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.05)' } } } },
     });
   },
 
@@ -250,173 +400,23 @@ const StatsPage = {
       type: 'bar',
       data: {
         labels: data.map(d => d.nome),
-        datasets: [{
-          label: 'Conexões',
-          data: data.map(d => d.conexoes),
-          backgroundColor: data.map(d => StatsPage._catColor(d.categoria)),
-          borderRadius: 3,
-        }],
+        datasets: [{ data: data.map(d => d.conexoes), backgroundColor: data.map(d => StatsPage._catColor(d.categoria)), borderRadius: 3 }],
       },
-      options: {
-        ...StatsPage._base(),
-        indexAxis: 'y',
-        plugins: {
-          ...StatsPage._base().plugins,
-          legend: { display: false },
-          tooltip: { callbacks: {
-            label: ctx => ` ${ctx.parsed.x} conexões`,
-            afterLabel: ctx => `  ${data[ctx.dataIndex].categoria}`,
-          }},
-        },
-        scales: {
-          x: { ticks: { color: '#999', font: { size: 10 } }, grid: { color: '#2a2a2a' } },
-          y: { ticks: { color: '#ccc', font: { size: 10 } }, grid: { color: '#2a2a2a' } },
-        },
-      },
+      options: { ...StatsPage._base(), indexAxis: 'y', plugins: { ...StatsPage._base().plugins, legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.x} conexões`, afterLabel: ctx => `  ${data[ctx.dataIndex].categoria}` } } }, scales: { x: { ...StatsPage._base().scales.x, ticks: { ...StatsPage._base().scales.x.ticks, precision: 0 } }, y: { ticks: { color: 'rgba(255,255,255,0.5)', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.05)' } } } },
     });
   },
 
   _drawEventParticipation(data) {
     const el = document.getElementById('chart-events');
     if (!el) return;
-    const colorMap = {
-      'confirmado': 'rgba(34,197,94,0.85)',
-      'pendente':   'rgba(255,214,0,0.85)',
-      'recusado':   'rgba(248,113,113,0.85)',
-      'cancelado':  'rgba(100,100,100,0.85)',
-    };
-    new Chart(el, {
-      type: 'pie',
-      data: {
-        labels: data.map(d => d.estado),
-        datasets: [{
-          data: data.map(d => d.total),
-          backgroundColor: data.map(d => colorMap[d.estado] || 'rgba(200,200,200,0.7)'),
-          borderWidth: 0,
-        }],
-      },
-      options: {
-        animation: false,
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { position: 'bottom', labels: { color: '#ccc', font: { size: 10 }, boxWidth: 12 } },
-        },
-      },
-    });
+    const colorMap = { 'confirmado': 'rgba(74,222,128,0.8)', 'pendente': 'rgba(255,214,0,0.8)', 'recusado': 'rgba(248,113,113,0.8)', 'cancelado': 'rgba(100,100,100,0.7)' };
+    new Chart(el, { type: 'pie', data: { labels: data.map(d => d.estado), datasets: [{ data: data.map(d => d.total), backgroundColor: data.map(d => colorMap[d.estado] || 'rgba(200,200,200,0.6)'), borderWidth: 0 }] }, options: { animation: false, responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: 'rgba(255,255,255,0.6)', font: { size: 10 }, boxWidth: 12 } } } } });
   },
 
   _drawConnections(data) {
     const el = document.getElementById('chart-connections');
     if (!el) return;
-    const colorMap = {
-      'aceite':   'rgba(34,197,94,0.85)',
-      'pendente': 'rgba(255,214,0,0.85)',
-      'recusado': 'rgba(248,113,113,0.85)',
-    };
-    new Chart(el, {
-      type: 'pie',
-      data: {
-        labels: data.map(d => d.estado),
-        datasets: [{
-          data: data.map(d => d.total),
-          backgroundColor: data.map(d => colorMap[d.estado] || 'rgba(200,200,200,0.7)'),
-          borderWidth: 0,
-        }],
-      },
-      options: {
-        animation: false,
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { position: 'bottom', labels: { color: '#ccc', font: { size: 10 }, boxWidth: 12 } },
-        },
-      },
-    });
-  },
-
-  _renderDescriptive(d) {
-    const el = document.getElementById('descriptive-section');
-    if (!el) return;
-
-    const statRow = (label, value, note = '') => `
-      <div style="display:flex;justify-content:space-between;align-items:baseline;padding:6px 0;border-bottom:1px solid #222;">
-        <span style="font-size:0.84rem;color:#ccc;">${label}</span>
-        <span style="font-size:0.92rem;font-weight:700;color:#FFD600;">${value}${note ? `<span style="font-size:0.72rem;font-weight:400;color:#777;margin-left:6px;">${note}</span>` : ''}</span>
-      </div>`;
-
-    const card = (title, rows) => `
-      <div class="card">
-        <div class="card-title">${title}</div>
-        ${rows.join('')}
-      </div>`;
-
-    const c = d.conexoes;
-    const connBlock = card('Conexões por utilizador', [
-      statRow('Média',         c.media),
-      statRow('Mediana',       c.mediana),
-      statRow('Desvio padrão', c.desvio, 'dispersão em torno da média'),
-      statRow('Mínimo',        c.min),
-      statRow('Máximo',        c.max),
-    ]);
-
-    const intBlock = card('Média de interesses por utilizador', d.interesses_por_categoria.map(r =>
-      statRow(r.categoria, r.media + ' interesses', `(${r.utilizadores} utilizadores)`)
-    ));
-
-    const p = d.polarizador;
-    const polBlock = card('Interesse mais polarizador', p ? [
-      statRow('Interesse',         p.nome),
-      statRow('Categoria',         p.categoria),
-      statRow('Utilizadores',      p.utilizadores, 'têm este interesse'),
-      statRow('Conexões geradas',  p.conexoes,     'pares que o partilham'),
-    ] : [statRow('Sem dados suficientes', '—')]);
-
-    const ev = d.eventos;
-    const evBlock = card('Participação em eventos', [
-      statRow('Média de participantes',        ev.media_participantes),
-      statRow('Evento mais concorrido',        ev.max_participantes + ' pessoas'),
-      statRow('Evento menos concorrido',       ev.min_participantes + ' pessoas'),
-    ]);
-
-    const m = d.mensagens;
-    const msgBlock = card('Mensagens por conversa', [
-      statRow('Média de mensagens',            m.media_por_conversa),
-      statRow('Conversa mais ativa',           m.max_numa_conversa + ' mensagens'),
-      statRow('Conversas sem mensagens',       m.conversas_sem_msgs, 'nunca falaram'),
-    ]);
-
-    const bivBlock = card('Mais interesses = mais conexões?', [
-      `<div style="font-size:0.76rem;color:#777;margin-bottom:10px;line-height:1.5;">
-        Correlação entre número de interesses e número de conexões aceites por utilizador.
-      </div>`,
-      `<table style="width:100%;border-collapse:collapse;font-size:0.82rem;">
-        <thead>
-          <tr>
-            <th style="text-align:left;color:#777;padding:4px 0;border-bottom:1px solid #333;font-weight:400;">Nº interesses</th>
-            <th style="text-align:center;color:#777;padding:4px 0;border-bottom:1px solid #333;font-weight:400;">Utilizadores</th>
-            <th style="text-align:right;color:#FFD600;padding:4px 0;border-bottom:1px solid #333;font-weight:700;">Média conexões</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${d.bivariada.map(r => `
-            <tr>
-              <td style="padding:5px 0;border-bottom:1px solid #1a1a1a;">${r.grupo}</td>
-              <td style="text-align:center;padding:5px 0;border-bottom:1px solid #1a1a1a;color:#aaa;">${r.utilizadores}</td>
-              <td style="text-align:right;padding:5px 0;border-bottom:1px solid #1a1a1a;font-weight:700;">${r.media_conexoes}</td>
-            </tr>`).join('')}
-        </tbody>
-      </table>`,
-    ]);
-
-    el.innerHTML = `
-      <div style="font-weight:700;font-size:0.95rem;margin-bottom:12px;color:#ccc;">Análise Descritiva</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-bottom:20px;">
-        ${connBlock}${intBlock}${polBlock}
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;">
-        ${evBlock}${msgBlock}${bivBlock}
-      </div>
-    `;
+    const colorMap = { 'aceite': 'rgba(74,222,128,0.8)', 'pendente': 'rgba(255,214,0,0.8)', 'recusado': 'rgba(248,113,113,0.8)' };
+    new Chart(el, { type: 'pie', data: { labels: data.map(d => d.estado), datasets: [{ data: data.map(d => d.total), backgroundColor: data.map(d => colorMap[d.estado] || 'rgba(200,200,200,0.6)'), borderWidth: 0 }] }, options: { animation: false, responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: 'rgba(255,255,255,0.6)', font: { size: 10 }, boxWidth: 12 } } } } });
   },
 };

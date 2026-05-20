@@ -22,11 +22,11 @@ const EventsPage = {
         : `<div class="events-list">${events.map(e => EventsPage.eventItem(e)).join('')}</div>`
       }
 
-      <div style="margin-top:24px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-          <div style="font-weight:700;">Mapa</div>
-          <button class="btn btn-outline btn-sm" onclick="EventsPage.loadMap()">Mostrar no mapa</button>
-        </div>
+      <div class="map-section">
+        <button class="map-toggle-btn" onclick="EventsPage.toggleMap(this)">
+          <span>Ver eventos no mapa</span>
+          <span class="map-chevron">▼</span>
+        </button>
         <div id="map"></div>
       </div>
     `, 'events');
@@ -38,22 +38,54 @@ const EventsPage = {
     App.render();
   },
 
+  async toggleMap(btn) {
+    const mapEl = document.getElementById('map');
+    if (!mapEl) return;
+    const isOpen = mapEl.classList.contains('open');
+    if (isOpen) {
+      mapEl.classList.remove('open');
+      btn.querySelector('.map-chevron').textContent = '▼';
+    } else {
+      mapEl.classList.add('open');
+      btn.querySelector('.map-chevron').textContent = '▲';
+      await EventsPage.loadMap();
+    }
+  },
+
+  async showEventOnMap(lat, lng) {
+    const mapEl = document.getElementById('map');
+    if (!mapEl) return;
+    const toggleBtn = document.querySelector('.map-toggle-btn');
+    if (!mapEl.classList.contains('open')) {
+      mapEl.classList.add('open');
+      if (toggleBtn) toggleBtn.querySelector('.map-chevron').textContent = '▲';
+      await EventsPage.loadMap();
+    }
+    mapEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  },
+
   eventItem(e) {
     const cancelled = e.evento_estado === 'cancelado';
     const pending   = e.invite_estado === 'pendente';
     const isCreator = String(e.evento_usuar_id) === String(App.state.user?.userId);
+    const bannerColors = ['135deg,#3b0070 0%,#0d001f 100%', '135deg,#004060 0%,#001020 100%', '135deg,#400040 0%,#0d001f 100%', '135deg,#003040 0%,#001020 100%'];
+    const color = bannerColors[e.evento_id % bannerColors.length];
 
     return `
       <div class="event-item ${cancelled ? 'cancelled' : ''}"
-           onclick="EventsPage.showDetail(${e.evento_id})" style="cursor:pointer;">
-        <div class="event-title">${e.evento_titulo}</div>
-        <div class="event-meta">${e.evento_data}</div>
-        <div class="event-meta">${e.evento_local || 'Sem local'} · Organizado por ${e.organizador}</div>
-        <div class="event-meta">${e.confirmados} confirmados</div>
-        <div class="event-footer" onclick="event.stopPropagation()">
-          ${cancelled ? `<span class="badge-cancelled">Cancelado</span>` : ''}
-          ${pending   ? `<span class="badge-pending">Convite pendente</span>` : ''}
-          ${EventsPage.eventActions(e, cancelled, pending, isCreator)}
+           onclick="EventsPage.showDetail(${e.evento_id})">
+        <div style="height:70px;background:linear-gradient(${color});position:relative;display:flex;align-items:flex-start;padding:10px;">
+          <span style="background:rgba(0,0,0,0.4);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,0.1);border-radius:6px;padding:3px 8px;font-size:0.7rem;font-weight:700;color:#fff;">${(e.evento_data || '').slice(0,10)}</span>
+        </div>
+        <div class="event-body">
+          <div class="event-title">${e.evento_titulo}</div>
+          <div class="event-meta">${e.evento_local || 'Sem local'}</div>
+          <div class="event-meta">${e.organizador} · ${e.confirmados} confirmados</div>
+          <div class="event-footer" onclick="event.stopPropagation()">
+            ${cancelled ? `<span class="badge-cancelled">Cancelado</span>` : ''}
+            ${pending   ? `<span class="badge-pending">Convite pendente</span>` : ''}
+            ${EventsPage.eventActions(e, cancelled, pending, isCreator)}
+          </div>
         </div>
       </div>`;
   },
@@ -75,7 +107,6 @@ const EventsPage = {
     return btns.join('');
   },
 
-  // ── map picker state ──────────────────────────────────────────
   _pickerMap:    null,
   _pickerMarker: null,
   _pickerLat:    null,
@@ -169,7 +200,7 @@ const EventsPage = {
         const a = data.address;
         input.value = [a.city || a.town || a.village, a.country].filter(Boolean).join(', ');
       }
-    } catch (e) { /* user types manually */ }
+    } catch (e) {}
   },
 
   searchLocation(term) {
@@ -250,6 +281,7 @@ const EventsPage = {
     const confirmed = participants.filter(p => p.invite_estado === 'confirmado');
     const pending   = participants.filter(p => p.invite_estado === 'pendente');
     const declined  = participants.filter(p => ['recusado','cancelado'].includes(p.invite_estado));
+    const hasCoords = e.evento_lat && e.evento_lng;
 
     const participantRow = (p) => `
       <div style="display:flex;align-items:center;gap:8px;padding:5px 0;">
@@ -260,33 +292,33 @@ const EventsPage = {
     Components.modal(`
       <h3>${e.evento_titulo}</h3>
       <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:14px;">
-        <div style="font-size:0.82rem;color:#aaa;">📅 ${e.evento_data}</div>
-        <div style="font-size:0.82rem;color:#aaa;">📍 ${e.evento_local || 'Sem local'}</div>
-        <div style="font-size:0.82rem;color:#aaa;">👤 Organizado por ${e.organizador}</div>
+        <div style="font-size:0.82rem;color:var(--dim);">${e.evento_data}</div>
+        <div style="font-size:0.82rem;color:var(--dim);">${e.evento_local || 'Sem local'}</div>
+        <div style="font-size:0.82rem;color:var(--dim);">Organizado por ${e.organizador}</div>
         ${e.evento_descricao ? `<div style="font-size:0.84rem;margin-top:6px;">${e.evento_descricao}</div>` : ''}
       </div>
 
+      ${hasCoords ? `
+        <button onclick="Components.closeModal(); EventsPage.showEventOnMap(${e.evento_lat}, ${e.evento_lng});"
+          style="width:100%;margin-bottom:14px;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:8px;padding:10px;font-size:0.86rem;font-weight:600;cursor:pointer;color:var(--text);">
+          Ver localização no mapa
+        </button>` : ''}
+
       ${confirmed.length ? `
         <div style="margin-bottom:12px;">
-          <div style="font-size:0.72rem;color:#4ade80;text-transform:uppercase;font-weight:700;margin-bottom:4px;">
-            Confirmados (${confirmed.length})
-          </div>
+          <div style="font-size:0.72rem;color:#4ade80;text-transform:uppercase;font-weight:700;margin-bottom:4px;">Confirmados (${confirmed.length})</div>
           ${confirmed.map(participantRow).join('')}
         </div>` : ''}
 
       ${pending.length ? `
         <div style="margin-bottom:12px;">
-          <div style="font-size:0.72rem;color:#FFD600;text-transform:uppercase;font-weight:700;margin-bottom:4px;">
-            Pendentes (${pending.length})
-          </div>
+          <div style="font-size:0.72rem;color:var(--yellow);text-transform:uppercase;font-weight:700;margin-bottom:4px;">Pendentes (${pending.length})</div>
           ${pending.map(participantRow).join('')}
         </div>` : ''}
 
       ${declined.length ? `
         <div style="margin-bottom:12px;">
-          <div style="font-size:0.72rem;color:#f87171;text-transform:uppercase;font-weight:700;margin-bottom:4px;">
-            Recusaram (${declined.length})
-          </div>
+          <div style="font-size:0.72rem;color:var(--red);text-transform:uppercase;font-weight:700;margin-bottom:4px;">Recusaram (${declined.length})</div>
           ${declined.map(participantRow).join('')}
         </div>` : ''}
 
@@ -387,4 +419,4 @@ const EventsPage = {
        .addTo(map);
     });
   },
-}
+};

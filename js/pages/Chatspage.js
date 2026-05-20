@@ -90,7 +90,7 @@ const ChatsPage = {
                       onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();ChatsPage.send();}"
                       oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,80)+'px'">
             </textarea>
-            <button class="send-btn" onclick="ChatsPage.send()" ${!chatName ? 'disabled style="opacity:0.3;"' : ''} style="border-radius:4px;width:auto;padding:0 10px;font-size:0.8rem;">Enviar</button>
+            <button class="send-btn" onclick="ChatsPage.send()" ${!chatName ? 'disabled style="opacity:0.3;"' : ''}>›</button>
           </div>
 
         </div>
@@ -104,7 +104,7 @@ const ChatsPage = {
       const res2 = await App.api('get_events', {}, 'GET');
       if (res2.ok) { App.state.events = res2.data; App.state.eventsLoaded = true; }
     }
-  
+ 
     if (App.state.activeEventId && !App.state.eventMessages.length) {
       const res3 = await App.api('get_event_messages', { eventId: App.state.activeEventId }, 'GET');
       if (res3.ok) App.state.eventMessages = res3.data;

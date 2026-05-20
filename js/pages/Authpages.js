@@ -103,9 +103,11 @@ login() {
   return `
     <div class="auth-split">
       <div class="auth-left">
+        <div class="auth-left-glow auth-left-glow-1"></div>
+        <div class="auth-left-glow auth-left-glow-2"></div>
+        <div class="auth-left-glow auth-left-glow-3"></div>
         <div class="auth-left-logo">
-          <img src="uploads/MoodlyLogo.png" alt="Moodly"/>
-          Mood<span>ly</span>
+          <img src="uploads/MoodlyLogo.png" alt="Moodly"/>Mood<span style="color:var(--yellow)">ly</span>
         </div>
         <div class="auth-left-body">
           <div class="auth-left-tagline">
@@ -167,21 +169,22 @@ login() {
     return `
     <div class="auth-split">
       <div class="auth-left">
+        <div class="auth-left-glow auth-left-glow-1"></div>
+        <div class="auth-left-glow auth-left-glow-2"></div>
+        <div class="auth-left-glow auth-left-glow-3"></div>
         <div class="auth-left-logo">
-          <img src="uploads/MoodlyLogo.png" alt="Moodly"/>
-          Mood<span>ly</span>
+          <img src="uploads/MoodlyLogo.png" alt="Moodly"/>Mood<span style="color:var(--yellow)">ly</span>
         </div>
         <div class="auth-left-body">
           <div class="auth-left-tagline">
-            Começa a tua<br/><span>jornada</span>
+            As tuas<br/><span>Conexões</span><br/>estão à espera
           </div>
           <div class="auth-left-sub">
-            Cria o teu perfil e começa a descobrir pessoas com os mesmos interesses.
+            Cria a tua conta e começa a descobrir pessoas incríveis com os mesmos gostos.
           </div>
           <div class="auth-pills">
-            <span class="auth-pill">🎮 Jogos</span>
-            <span class="auth-pill">🎬 Filmes</span>
-            <span class="auth-pill">🎵 Música</span>
+            <span class="auth-pill">Privacidade garantida</span>
+            <span class="auth-pill">Feito no IADE</span>
           </div>
         </div>
       </div>
@@ -242,9 +245,11 @@ login() {
     return `
     <div class="auth-split">
       <div class="auth-left">
+        <div class="auth-left-glow auth-left-glow-1"></div>
+        <div class="auth-left-glow auth-left-glow-2"></div>
+        <div class="auth-left-glow auth-left-glow-3"></div>
         <div class="auth-left-logo">
-          <img src="uploads/MoodlyLogo.png" alt="Moodly"/>
-          Mood<span>ly</span>
+          <img src="uploads/MoodlyLogo.png" alt="Moodly"/>Mood<span style="color:var(--yellow)">ly</span>
         </div>
         <div class="auth-left-body">
           <div class="auth-left-tagline">
@@ -290,9 +295,11 @@ login() {
     return `
     <div class="auth-split">
       <div class="auth-left">
+        <div class="auth-left-glow auth-left-glow-1"></div>
+        <div class="auth-left-glow auth-left-glow-2"></div>
+        <div class="auth-left-glow auth-left-glow-3"></div>
         <div class="auth-left-logo">
-          <img src="uploads/MoodlyLogo.png" alt="Moodly"/>
-          Mood<span>ly</span>
+          <img src="uploads/MoodlyLogo.png" alt="Moodly"/>Mood<span style="color:var(--yellow)">ly</span>
         </div>
         <div class="auth-left-body">
           <div class="auth-left-tagline">

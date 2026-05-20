@@ -107,6 +107,7 @@ if ($action === 'stats_activity') {
         GROUP BY dia
         ORDER BY dia ASC
     ")->fetchAll(PDO::FETCH_ASSOC);
+
     $map = [];
     foreach ($rows as $r) $map[$r['dia']] = (int)$r['mensagens'];
     $result = [];
@@ -183,6 +184,8 @@ if ($action === 'stats_top_users') {
 if ($action === 'stats_descriptive') {
     requireAdmin();
     $db = db();
+
+
     $connPerUser = $db->query("
         SELECT u.usuar_id, COUNT(pc.pedcon_id) AS n
         FROM usuario u
@@ -203,6 +206,22 @@ if ($action === 'stats_descriptive') {
     $variance = 0;
     foreach ($vals as $v) $variance += ($v - $mean) ** 2;
     $stddev = $n > 1 ? sqrt($variance / $n) : 0;
+
+    $p25 = $n ? $vals[(int)floor($n * 0.25)] : 0;
+    $p75 = $n ? $vals[(int)floor($n * 0.75)] : 0;
+
+    $freq = array_count_values($vals);
+    arsort($freq);
+    $moda = key($freq);
+
+    $rawMsgValues = $db->query("
+        SELECT COUNT(p.post_id) AS cnt
+        FROM pedido_conexao pc
+        LEFT JOIN post p ON p.post_connect_id = pc.pedcon_id
+        WHERE pc.pedcon_estado = 'aceite'
+        GROUP BY pc.pedcon_id
+    ")->fetchAll(PDO::FETCH_COLUMN);
+
     $interestPerCat = $db->query("
         SELECT i.inter_nome AS categoria,
                COUNT(ui.usint_usuar_id) AS total_entradas,
@@ -220,6 +239,8 @@ if ($action === 'stats_descriptive') {
             'utilizadores' => (int)$r['utilizadores'],
         ];
     }
+
+
     $polarRows = $db->query("
         SELECT s.subinter_id, s.subinter_nome AS nome, i.inter_nome AS categoria,
                COUNT(DISTINCT ui.usint_usuar_id) AS utilizadores,
@@ -254,6 +275,7 @@ if ($action === 'stats_descriptive') {
             GROUP BY invite_evento_id
         ) sub
     ")->fetch(PDO::FETCH_ASSOC);
+
     $msgStats = $db->query("
         SELECT AVG(cnt) AS media, MAX(cnt) AS maximo,
                SUM(CASE WHEN cnt = 0 THEN 1 ELSE 0 END) AS sem_msgs
@@ -265,6 +287,7 @@ if ($action === 'stats_descriptive') {
             GROUP BY pc.pedcon_id
         ) sub
     ")->fetch(PDO::FETCH_ASSOC);
+
     $bivariada = $db->query("
         SELECT grupos.grupo,
                ROUND(AVG(grupos.conexoes), 2) AS media_conexoes,
@@ -273,9 +296,10 @@ if ($action === 'stats_descriptive') {
             SELECT u.usuar_id,
                    CASE
                        WHEN COUNT(DISTINCT ui.usint_subinter_id) = 0 THEN '0'
-                       WHEN COUNT(DISTINCT ui.usint_subinter_id) BETWEEN 1 AND 2 THEN '1-2'
-                       WHEN COUNT(DISTINCT ui.usint_subinter_id) BETWEEN 3 AND 4 THEN '3-4'
-                       ELSE '5+'
+                       WHEN COUNT(DISTINCT ui.usint_subinter_id) BETWEEN 1 AND 3 THEN '1-3'
+                       WHEN COUNT(DISTINCT ui.usint_subinter_id) BETWEEN 4 AND 6 THEN '4-6'
+                       WHEN COUNT(DISTINCT ui.usint_subinter_id) BETWEEN 7 AND 10 THEN '7-10'
+                       ELSE '11+'
                    END AS grupo,
                    (
                        SELECT COUNT(*) FROM pedido_conexao pc
@@ -288,29 +312,35 @@ if ($action === 'stats_descriptive') {
             GROUP BY u.usuar_id
         ) grupos
         GROUP BY grupos.grupo
-        ORDER BY FIELD(grupos.grupo,'0','1-2','3-4','5+')
+        ORDER BY FIELD(grupos.grupo,'0','1-3','4-6','7-10','11+')
     ")->fetchAll(PDO::FETCH_ASSOC);
 
     ok([
         'conexoes' => [
             'media'   => round($mean, 2),
             'mediana' => round($median, 2),
+            'moda'    => $moda,
             'desvio'  => round($stddev, 2),
             'min'     => $vals[0] ?? 0,
             'max'     => $n ? $vals[$n-1] : 0,
+            'p25'     => $p25,
+            'p75'     => $p75,
+            'n'       => $n,
         ],
         'interesses_por_categoria' => $avgPerCat,
         'polarizador'              => $polarizador,
         'eventos' => [
-            'media_participantes' => round((float)($eventStats['media'] ?? 0), 2),
+            'media_participantes' => round((float)($eventStats['media'] ?? 0), 1),
             'max_participantes'   => (int)($eventStats['maximo'] ?? 0),
             'min_participantes'   => (int)($eventStats['minimo'] ?? 0),
         ],
         'mensagens' => [
-            'media_por_conversa'  => round((float)($msgStats['media'] ?? 0), 2),
+            'media_por_conversa'  => round((float)($msgStats['media'] ?? 0), 1),
             'max_numa_conversa'   => (int)($msgStats['maximo'] ?? 0),
             'conversas_sem_msgs'  => (int)($msgStats['sem_msgs'] ?? 0),
         ],
-        'bivariada' => $bivariada,
+        'bivariada'        => $bivariada,
+        '_raw_conn_values' => $vals,
+        '_raw_msg_values'  => array_map('intval', $rawMsgValues),
     ]);
 }

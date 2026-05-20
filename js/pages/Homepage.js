@@ -28,58 +28,49 @@ const HomePage = {
 
     const html = Components.shell(`
       <div class="page-header">
-        <div><h1>Descobrir</h1></div>
+        <div><h1>Descobrir</h1><p>Encontra Moodlers com os teus gostos</p></div>
         <input type="text" placeholder="Pesquisar utilizadores..."
-               style="width:220px;padding:5px 8px;background:#222;border:1px solid #444;color:#eee;"
-               oninput="HomePage.search(this.value)"/>
+               style="width:220px;" oninput="HomePage.search(this.value)"/>
       </div>
 
       <div id="search-results"></div>
 
-      <div class="discover-wrap">
+      <div style="display:grid;grid-template-columns:1fr 260px;gap:20px;align-items:start;">
 
-        <div class="discover-card">
-          <div class="discover-photo">
-            <div class="discover-photo-avatar">
-              ${photo ? `<img src="${photo}"/>` : inits}
+        <div class="card" style="padding:0;overflow:hidden;">
+          <div style="height:100px;background:linear-gradient(135deg,#3b0070,#1a0040);"></div>
+          <div style="padding:0 20px 20px;">
+            <div style="width:76px;height:76px;border-radius:50%;background:#5b21b6;border:4px solid var(--panel);display:flex;align-items:center;justify-content:center;font-size:1.6rem;font-weight:800;overflow:hidden;margin:-38px 0 12px;position:relative;z-index:1;">
+              ${photo ? `<img src="${photo}" style="width:100%;height:100%;object-fit:cover;"/>` : inits}
             </div>
-            <div class="discover-name">${user.usuar_nome}</div>
-            <div class="discover-score">${user.score || 0} interesses em comum</div>
-          </div>
-          <div class="discover-info">
+            <div style="font-size:1.15rem;font-weight:800;color:#fff;margin-bottom:3px;">${user.usuar_nome}</div>
+            <div style="font-size:0.8rem;color:var(--yellow);font-weight:600;margin-bottom:16px;">⭐ ${user.score || 0} interesses em comum</div>
             ${Components.interestCategories(user.interests || [])}
+            <div style="display:flex;gap:10px;margin-top:20px;">
+              <button onclick="HomePage.connect(${user.usuar_id},'${user.usuar_nome.replace(/'/g,"\\'")}'); event.stopPropagation();"
+                style="flex:1;background:rgba(74,222,128,0.15);border:1px solid rgba(74,222,128,0.4);color:#4ade80;border-radius:10px;padding:11px;font-size:0.9rem;font-weight:700;cursor:pointer;transition:background 0.15s;">
+                ✓ Conectar
+              </button>
+              <button onclick="HomePage.pass(); event.stopPropagation();"
+                style="flex:1;background:rgba(248,113,113,0.12);border:1px solid rgba(248,113,113,0.35);color:#f87171;border-radius:10px;padding:11px;font-size:0.9rem;font-weight:700;cursor:pointer;transition:background 0.15s;">
+                ✕ Passar
+              </button>
+              <button onclick="HomePage.showReport(${user.usuar_id},'${user.usuar_nome.replace(/'/g,"\\'")}'); event.stopPropagation();"
+                style="background:rgba(255,255,255,0.05);border:1px solid var(--border);color:var(--dim);border-radius:10px;padding:11px 14px;font-size:0.88rem;cursor:pointer;transition:background 0.15s;">
+                ⚑
+              </button>
+            </div>
           </div>
         </div>
 
-        <div class="discover-btns">
-          <span class="discover-action connect"
-                onclick="HomePage.connect(${user.usuar_id}, '${user.usuar_nome.replace(/'/g,"\\'")}')">
-            Conectar
-          </span>
-          <span class="discover-action pass" onclick="HomePage.pass()">
-            Passar
-          </span>
-          <span class="discover-action" style="color:#f87171;margin-top:12px;"
-                onclick="HomePage.showReport(${user.usuar_id}, '${user.usuar_nome.replace(/'/g,"\\'")}')">
-            Reportar
-          </span>
-        </div>
-
-      </div>
-
-      <div style="display:flex;gap:16px;margin-top:24px;align-items:flex-start;">
-
-        <div style="flex:1;">
-          <div style="font-weight:700;margin-bottom:8px;font-size:0.9rem;">Pedidos enviados</div>
-          <div id="sent-requests-list" style="display:flex;flex-direction:column;gap:6px;">
-            <span style="color:#777;font-size:0.82rem;">A carregar...</span>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div class="card" style="margin-bottom:0;">
+            <div class="card-title">Pedidos enviados</div>
+            <div id="sent-requests-list"><span style="color:var(--dim);font-size:0.82rem;">A carregar...</span></div>
           </div>
-        </div>
-
-        <div style="flex:1;">
-          <div style="font-weight:700;margin-bottom:8px;font-size:0.9rem;">Novas conexões</div>
-          <div id="new-connections-list" style="display:flex;flex-direction:column;gap:6px;">
-            <span style="color:#777;font-size:0.82rem;">A carregar...</span>
+          <div class="card" style="margin-bottom:0;">
+            <div class="card-title">Novas conexões</div>
+            <div id="new-connections-list"><span style="color:var(--dim);font-size:0.82rem;">A carregar...</span></div>
           </div>
         </div>
 
@@ -142,6 +133,7 @@ const HomePage = {
     App.state.activeChatName = name;
     App.state.activeEventId  = null;
     App.state.messages       = [];
+    // Reset so chats page loads fresh list
     App.state.chatsLoaded    = false;
     App.navigate('chats');
   },
