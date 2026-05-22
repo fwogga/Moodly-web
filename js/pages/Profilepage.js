@@ -16,14 +16,15 @@ const ProfilePage = {
     return Components.shell(`
       <div class="page-header">
         <div><h1>Perfil</h1><p>Gere as tuas informações</p></div>
-        <button class="btn btn-outline btn-sm" onclick="App.logout()">Sair</button>
       </div>
 
       <div class="profile-grid">
 
         <div style="display:flex;flex-direction:column;gap:14px;">
           <div class="card" style="text-align:center;padding:0;overflow:hidden;">
-            <div style="height:80px;background:linear-gradient(135deg,#4c0090,#1a0040);"></div>
+            <div style="height:100px;background:linear-gradient(135deg,#4c0090,#1a0040);position:relative;">
+              <button onclick="App.logout()" style="position:absolute;top:10px;right:10px;background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:4px 10px;font-size:0.75rem;font-weight:600;color:rgba(255,255,255,0.7);cursor:pointer;backdrop-filter:blur(4px);">Sair</button>
+            </div>
             <div style="padding:0 20px 20px;">
               <div class="profile-avatar-big">
                 ${u.usuar_foto_perfil

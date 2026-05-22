@@ -10,59 +10,57 @@ const ChatsPage = {
     const messages    = isEventChat ? App.state.eventMessages : App.state.messages;
     const chatName    = App.state.activeChatName || '';
     const myId        = String(App.state.user?.userId);
-    const eventChats = (App.state.events || []).filter(e =>
+    const chatOpen    = !!chatName;
+    const eventChats  = (App.state.events || []).filter(e =>
       e.invite_estado === 'confirmado' && e.evento_estado !== 'cancelado'
     );
 
     return `
       ${Components.sidebar('chats')}
-      <div style="flex:1;display:flex;overflow:hidden;height:100vh;">
+      <div class="chat-layout">
 
-        <!--list -->
-        <div style="width:260px;min-width:260px;background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;height:100vh;overflow:hidden;">
-          <div style="padding:20px 20px 12px;border-bottom:1px solid var(--border);flex-shrink:0;">
-            <h1>Mensagens</h1>
+        <!-- list panel -->
+        <div class="chat-list-panel ${chatOpen ? 'chat-hidden-mobile' : ''}">
+          <div class="chat-list-header">
+            <h1 style="font-size:1.2rem;font-weight:800;">Mensagens</h1>
           </div>
-          <div style="flex:1;overflow-y:auto;" id="chat-list">
-
-            ${App.state.chats.map(c => `
+          <div class="chat-list-body" id="chat-list">
+            ${App.state.chats.map((c, i) => `
               <div class="chat-item ${!isEventChat && App.state.activeChatId == c.connection_id ? 'active' : ''}"
                    onclick="ChatsPage.openChat(${c.connection_id}, '${c.usuar_nome.replace(/'/g,"\\'")}')">
-                ${Components.avatar(c.usuar_nome, 34, c.usuar_foto_perfil || '')}
+                ${Components.avatar(c.usuar_nome, 36, c.usuar_foto_perfil || '')}
                 <div style="flex:1;min-width:0;">
                   <div class="chat-item-name">${c.usuar_nome}</div>
                   <div class="chat-item-preview">${c.last_message || 'Sem mensagens'}</div>
                 </div>
-              </div>
-            `).join('')}
-            ${eventChats.map(e => `
+              </div>`).join('')}
+            ${eventChats.map((e, i) => `
               <div class="chat-item ${isEventChat && App.state.activeEventId == e.evento_id ? 'active' : ''}"
                    onclick="ChatsPage.openEventChat(${e.evento_id}, '${e.evento_titulo.replace(/'/g,"\\'")}')">
-                ${Components.avatar(e.evento_titulo, 34)}
+                ${Components.avatar(e.evento_titulo, 36)}
                 <div style="flex:1;min-width:0;">
                   <div class="chat-item-name">${e.evento_titulo}</div>
+                  <div style="font-size:0.72rem;color:var(--dim);">Grupo</div>
                 </div>
-              </div>
-            `).join('')}
+              </div>`).join('')}
             ${!App.state.chats.length && !eventChats.length
-              ? `<div style="padding:16px;color:var(--dim);font-size:0.82rem;">Sem conversas ainda.<br>Conecta-te a alguém primeiro.</div>`
+              ? `<div style="padding:24px 16px;color:var(--dim);font-size:0.84rem;">Sem conversas ainda.<br>Conecta-te a alguém primeiro.</div>`
               : ''}
           </div>
         </div>
 
-        <!--chatroom -->
-        <div style="flex:1;display:flex;flex-direction:column;height:100vh;overflow:hidden;background:var(--bg);">
+        <!-- chat panel -->
+        <div class="chat-room-panel ${chatOpen ? '' : 'chat-hidden-mobile'}">
 
-          ${chatName ? `
-            <div style="padding:12px 18px;border-bottom:1px solid var(--border);background:var(--panel);display:flex;align-items:center;gap:10px;flex-shrink:0;">
+          <div class="chat-room-header">
+            <button class="chat-back-btn" onclick="ChatsPage.closeChat()">←</button>
+            ${chatName ? `
               ${Components.avatar(chatName, 34)}
-              <span style="font-weight:700;font-size:0.9rem;">${chatName}</span>
-            </div>
-          ` : `
-            <div style="padding:12px 18px;border-bottom:1px solid var(--border);background:var(--panel);height:59px;flex-shrink:0;"></div>
-          `}
+              <span style="font-weight:700;font-size:0.92rem;margin-left:8px;">${chatName}</span>
+            ` : `<span style="color:var(--dim);font-size:0.86rem;">Seleciona uma conversa</span>`}
+          </div>
 
-          <div style="flex:1;overflow-y:auto;padding:16px 18px;display:flex;flex-direction:column;gap:8px;" id="msg-list">
+          <div class="chat-room-messages" id="msg-list">
             ${messages.map(m => {
               const senderId = isEventChat ? String(m.gp_usuar_id) : String(m.post_usuar_id);
               const isMe     = senderId === myId;
@@ -75,15 +73,11 @@ const ChatsPage = {
                   <div class="msg-time">${(time || '').slice(11,16)}</div>
                 </div>`;
             }).join('')}
-            ${!chatName
-              ? `<div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--dim);font-size:0.86rem;padding-top:60px;">Seleciona uma conversa</div>`
-              : ''}
-            ${chatName && !messages.length
-              ? `<div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--dim);font-size:0.86rem;padding-top:60px;">Sem mensagens ainda</div>`
-              : ''}
+            ${!chatName ? `<div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--dim);font-size:0.86rem;padding-top:60px;">Seleciona uma conversa</div>` : ''}
+            ${chatName && !messages.length ? `<div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--dim);font-size:0.86rem;padding-top:60px;">Sem mensagens ainda</div>` : ''}
           </div>
 
-          <div style="padding:10px 18px;border-top:1px solid var(--border);background:var(--panel);display:flex;gap:8px;align-items:center;flex-shrink:0;">
+          <div class="chat-room-input">
             <textarea class="chat-input" id="msg-input" rows="1"
                       placeholder="${chatName ? 'Escreve uma mensagem...' : ''}"
                       ${!chatName ? 'disabled' : ''}
@@ -94,7 +88,15 @@ const ChatsPage = {
           </div>
 
         </div>
+
       </div>`;
+  },
+
+  closeChat() {
+    App.state.activeChatId   = null;
+    App.state.activeChatName = null;
+    App.state.activeEventId  = null;
+    App.render();
   },
 
   async loadChats() {
@@ -104,7 +106,6 @@ const ChatsPage = {
       const res2 = await App.api('get_events', {}, 'GET');
       if (res2.ok) { App.state.events = res2.data; App.state.eventsLoaded = true; }
     }
- 
     if (App.state.activeEventId && !App.state.eventMessages.length) {
       const res3 = await App.api('get_event_messages', { eventId: App.state.activeEventId }, 'GET');
       if (res3.ok) App.state.eventMessages = res3.data;
@@ -185,7 +186,7 @@ const ChatsPage = {
       .map(c => `
         <div class="chat-item ${App.state.activeChatId == c.connection_id ? 'active' : ''}"
              onclick="ChatsPage.openChat(${c.connection_id}, '${c.usuar_nome.replace(/'/g,"\\'")}')">
-          ${Components.avatar(c.usuar_nome, 34, c.usuar_foto_perfil || '')}
+          ${Components.avatar(c.usuar_nome, 36, c.usuar_foto_perfil || '')}
           <div style="flex:1;min-width:0;">
             <div class="chat-item-name">${c.usuar_nome}</div>
             <div class="chat-item-preview">${c.last_message || ''}</div>

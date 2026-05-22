@@ -103,6 +103,17 @@ const App = {
   },
 
   async logout() {
+    Components.modal(`
+      <h3>Terminar sessão</h3>
+      <p style="color:var(--dim);font-size:0.88rem;margin-bottom:4px;">Tens a certeza que queres sair da conta?</p>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="Components.closeModal()">Cancelar</button>
+        <button class="btn btn-danger" onclick="Components.closeModal(); App._doLogout();">Sair</button>
+      </div>
+    `);
+  },
+
+  async _doLogout() {
     await this.api('logout');
     this.state.user = null;
     this.state.discoverLoaded = false;

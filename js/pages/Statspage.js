@@ -1,90 +1,114 @@
 const StatsPage = {
 
   render() {
+    const section = (title) => `
+      <div style="display:flex;align-items:center;gap:12px;margin:28px 0 14px;">
+        <div style="font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--yellow);white-space:nowrap;">${title}</div>
+        <div style="flex:1;height:1px;background:rgba(255,214,0,0.15);"></div>
+      </div>`;
+
     const html = Components.shell(`
       <div class="page-header">
         <div><h1>Estatísticas</h1><p>Painel de análise para decisões sobre a plataforma</p></div>
       </div>
 
-      <div id="stats-kpis" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:28px;">
+      <!-- KPI row: Utilizadores -->
+      ${section('Utilizadores')}
+      <div id="stats-kpis-users" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:4px;">
         <div style="color:var(--dim);font-size:0.82rem;">A carregar...</div>
       </div>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;">
-        <div class="card">
-          <div class="card-title">Análise descritiva — conexões por utilizador</div>
+      <!-- KPI row: Atividade -->
+      ${section('Atividade')}
+      <div id="stats-kpis-activity" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:4px;">
+        <div style="color:var(--dim);font-size:0.82rem;">A carregar...</div>
+      </div>
+
+      <!-- Conexões section -->
+      ${section('Conexões')}
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:4px;">
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-title">Análise descritiva</div>
           <div id="desc-connections"></div>
         </div>
-        <div class="card">
-          <div class="card-title">Análise descritiva — mensagens e eventos</div>
-          <div id="desc-other"></div>
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-title">Histograma — distribuição</div>
+          <div style="position:relative;height:180px;"><canvas id="chart-hist-conn"></canvas></div>
+          <div id="hist-conn-insight" style="margin-top:8px;font-size:0.76rem;color:var(--dim);"></div>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-title">Estado dos pedidos</div>
+          <div style="position:relative;height:180px;"><canvas id="chart-connections"></canvas></div>
         </div>
       </div>
-
-      <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-bottom:20px;">
-        <div class="card">
-          <div class="card-title">Atividade de mensagens — últimos 14 dias</div>
-          <div style="position:relative;height:200px;"><canvas id="chart-activity"></canvas></div>
-          <div id="activity-insight" style="margin-top:10px;font-size:0.78rem;color:var(--dim);"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;margin-bottom:4px;">
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-title">Correlação: interesses vs conexões</div>
+          <div style="position:relative;height:200px;"><canvas id="chart-correlation"></canvas></div>
+          <div id="corr-insight" style="margin-top:8px;font-size:0.76rem;color:var(--dim);"></div>
         </div>
-        <div class="card">
-          <div class="card-title">Interesses por categoria</div>
-          <div style="position:relative;height:200px;"><canvas id="chart-category"></canvas></div>
-        </div>
-      </div>
-
-      <div style="margin-bottom:8px;font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--dim);">Interesses</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;">
-        <div class="card">
-          <div class="card-title">Mais populares (nº de utilizadores)</div>
-          <div style="position:relative;height:280px;"><canvas id="chart-popular"></canvas></div>
-        </div>
-        <div class="card">
-          <div class="card-title">Que mais uniram pessoas (conexões geradas)</div>
-          <div style="position:relative;height:280px;"><canvas id="chart-uniting"></canvas></div>
-        </div>
-      </div>
-
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;">
-        <div class="card">
-          <div class="card-title">Histograma — distribuição de conexões por utilizador</div>
-          <div style="position:relative;height:200px;"><canvas id="chart-hist-conn"></canvas></div>
-          <div id="hist-conn-insight" style="margin-top:10px;font-size:0.78rem;color:var(--dim);"></div>
-        </div>
-        <div class="card">
-          <div class="card-title">Histograma — mensagens por conversa</div>
-          <div style="position:relative;height:200px;"><canvas id="chart-hist-msg"></canvas></div>
-          <div id="hist-msg-insight" style="margin-top:10px;font-size:0.78rem;color:var(--dim);"></div>
-        </div>
-      </div>
-
-      <div style="margin-bottom:8px;font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--dim);">Eventos & Chats</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-bottom:20px;">
-        <div class="card">
-          <div class="card-title">Estado dos convites de eventos</div>
-          <div style="position:relative;height:200px;"><canvas id="chart-events"></canvas></div>
-        </div>
-        <div class="card">
-          <div class="card-title">Estado dos pedidos de conexão</div>
-          <div style="position:relative;height:200px;"><canvas id="chart-connections"></canvas></div>
-        </div>
-        <div class="card">
-          <div class="card-title">Top 5 utilizadores mais conectados</div>
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-title">Top 5 mais conectados</div>
           <div id="top-users" style="display:flex;flex-direction:column;gap:8px;margin-top:4px;">
             <span style="color:var(--dim);font-size:0.82rem;">A carregar...</span>
           </div>
         </div>
       </div>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;">
-        <div class="card">
-          <div class="card-title">Correlação: interesses vs conexões</div>
-          <div style="position:relative;height:220px;"><canvas id="chart-correlation"></canvas></div>
-          <div id="corr-insight" style="margin-top:10px;font-size:0.78rem;color:var(--dim);"></div>
+      <!-- Interesses section -->
+      ${section('Interesses')}
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:4px;">
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-title">Distribuição por categoria</div>
+          <div style="position:relative;height:200px;"><canvas id="chart-category"></canvas></div>
         </div>
-        <div class="card">
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-title">Mais populares</div>
+          <div style="position:relative;height:200px;"><canvas id="chart-popular"></canvas></div>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-title">Que mais uniram pessoas</div>
+          <div style="position:relative;height:200px;"><canvas id="chart-uniting"></canvas></div>
+        </div>
+      </div>
+      <div style="margin-top:16px;margin-bottom:4px;">
+        <div class="card" style="margin-bottom:0;">
           <div class="card-title">Interesse mais polarizador</div>
           <div id="polarizador-block" style="margin-top:4px;"></div>
+        </div>
+      </div>
+
+      <!-- Mensagens section -->
+      ${section('Mensagens')}
+      <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:4px;">
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-title">Atividade — últimos 14 dias</div>
+          <div style="position:relative;height:200px;"><canvas id="chart-activity"></canvas></div>
+          <div id="activity-insight" style="margin-top:8px;font-size:0.76rem;color:var(--dim);"></div>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-title">Análise descritiva</div>
+          <div id="desc-other"></div>
+        </div>
+      </div>
+      <div style="margin-top:16px;margin-bottom:4px;">
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-title">Histograma — mensagens por conversa</div>
+          <div style="position:relative;height:180px;"><canvas id="chart-hist-msg"></canvas></div>
+          <div id="hist-msg-insight" style="margin-top:8px;font-size:0.76rem;color:var(--dim);"></div>
+        </div>
+      </div>
+
+      <!-- Eventos section -->
+      ${section('Eventos')}
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px;">
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-title">Estado dos convites</div>
+          <div style="position:relative;height:200px;"><canvas id="chart-events"></canvas></div>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-title">Participação média e extremos</div>
+          <div id="desc-events" style="margin-top:4px;"></div>
         </div>
       </div>
 
@@ -111,6 +135,7 @@ const StatsPage = {
 
     if (globalRes.ok) StatsPage._renderKPIs(globalRes.data, actRes.ok ? actRes.data : []);
     if (descRes.ok)   StatsPage._renderDescriptive(descRes.data);
+    if (descRes.ok)   StatsPage._renderDescEvents(descRes.data);
     if (actRes.ok)    StatsPage._drawActivity(actRes.data);
     if (catRes.ok)    StatsPage._drawCategory(catRes.data);
     if (popRes.ok)    StatsPage._drawPopular(popRes.data);
@@ -124,23 +149,30 @@ const StatsPage = {
   },
 
   _renderKPIs(g, actData) {
-    const el = document.getElementById('stats-kpis');
-    if (!el) return;
     const totalMsgs14 = actData.reduce((s, d) => s + d.mensagens, 0);
     const maxDay = actData.reduce((m, d) => d.mensagens > m.mensagens ? d : m, { dia: '—', mensagens: 0 });
-    const items = [
-      { n: g.users,       l: 'Utilizadores' },
+
+    const usersEl = document.getElementById('stats-kpis-users');
+    if (usersEl) usersEl.innerHTML = [
+      { n: g.users,       l: 'Total' },
+      { n: g.banned,      l: 'Banidos',     warn: g.banned > 0 },
       { n: g.connections, l: 'Conexões aceites' },
-      { n: g.events,      l: 'Eventos' },
+      { n: g.reports,     l: 'Reports pendentes', warn: g.reports > 0 },
+    ].map(i => `
+      <div class="stat-box" style="flex:1;min-width:110px;">
+        <div class="stat-box-num" style="${i.warn ? 'color:var(--red)' : ''}">${i.n}</div>
+        <div class="stat-box-lbl">${i.l}</div>
+      </div>`).join('');
+
+    const actEl = document.getElementById('stats-kpis-activity');
+    if (actEl) actEl.innerHTML = [
       { n: g.messages,    l: 'Mensagens totais' },
       { n: totalMsgs14,   l: 'Msgs (14 dias)' },
       { n: maxDay.mensagens + ' (' + (maxDay.dia.slice(5) || '—') + ')', l: 'Dia mais ativo' },
-      { n: g.reports,     l: 'Reports pendentes', warn: g.reports > 0 },
-      { n: g.banned,      l: 'Banidos',           warn: g.banned > 0 },
-    ];
-    el.innerHTML = items.map(i => `
+      { n: g.events,      l: 'Eventos criados' },
+    ].map(i => `
       <div class="stat-box" style="flex:1;min-width:110px;">
-        <div class="stat-box-num" style="${i.warn ? 'color:var(--red)' : ''}">${i.n}</div>
+        <div class="stat-box-num">${i.n}</div>
         <div class="stat-box-lbl">${i.l}</div>
       </div>`).join('');
   },
@@ -173,7 +205,7 @@ const StatsPage = {
       StatsPage._row('P25 / P75',      `${c.p25 ?? '—'} / ${c.p75 ?? '—'}`, 'percentis'),
       StatsPage._row('IC 95% da média', ci95(c.media, c.desvio, c.n ?? 10), ''),
       `<div style="margin-top:10px;font-size:0.75rem;color:var(--dim2);line-height:1.6;">
-        ${c.desvio > c.media ? 'Desvio padrão elevado — distribuição assimétrica. Alguns utilizadores têm muito mais conexões que a maioria.' : 'Distribuição relativamente homogénea entre utilizadores.'}
+        ${c.desvio > c.media ? 'Desvio padrão elevado e distribuição assimétrica. Alguns utilizadores têm muito mais conexões que a maioria.' : 'Distribuição relativamente homogénea entre utilizadores.'}
       </div>`,
     ].join('');
 
@@ -226,8 +258,8 @@ const StatsPage = {
       const first = parseFloat(d.bivariada[0]?.media_conexoes || 0);
       const last  = parseFloat(d.bivariada[d.bivariada.length - 1]?.media_conexoes || 0);
       corrEl.textContent = last > first
-        ? `Correlação positiva — utilizadores com mais interesses tendem a ter mais conexões.`
-        : `Correlação não clara — mais interesses não implica necessariamente mais conexões.`;
+        ? `Correlação positiva, utilizadores com mais interesses tendem a ter mais conexões.`
+        : `Correlação não clara, mais interesses não implica necessariamente mais conexões.`;
     }
   },
 
@@ -245,7 +277,7 @@ const StatsPage = {
       ${StatsPage._row('Conexões que partilham este interesse', p.conexoes)}
       ${StatsPage._row('Taxa de conversão', taxa + '%', 'utilizadores → conexão')}
       <div style="margin-top:12px;font-size:0.78rem;color:var(--dim2);line-height:1.6;">
-        Este interesse é popular mas converte poucas conexões — pode indicar que os utilizadores têm gostos em comum mas não se conectam. Considera destacá-lo no algoritmo de descoberta.
+        Este interesse é popular mas converte poucas conexões. Pode indicar que os utilizadores têm gostos em comum mas não se conectam. Considera destacá-lo no algoritmo de descoberta.
       </div>`;
   },
 
@@ -298,6 +330,17 @@ const StatsPage = {
     if (hmEl && d.mensagens) {
       hmEl.textContent = `Média: ${d.mensagens.media_por_conversa.toFixed(1)} msgs/conversa · Máx: ${d.mensagens.max_numa_conversa}`;
     }
+  },
+
+  _renderDescEvents(d) {
+    const el = document.getElementById('desc-events');
+    if (!el || !d.eventos) return;
+    const ev = d.eventos;
+    el.innerHTML = [
+      StatsPage._row('Média de participantes', ev.media_participantes.toFixed(1)),
+      StatsPage._row('Evento mais concorrido', ev.max_participantes + ' pessoas'),
+      StatsPage._row('Evento menos concorrido', ev.min_participantes + ' pessoas'),
+    ].join('');
   },
 
   _renderTopUsers(data) {

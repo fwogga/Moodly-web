@@ -1,14 +1,4 @@
 <?php
-
-function requireAdmin() {
-    $userId = requireLogin();
-    $db = db();
-    $st = $db->prepare("SELECT usuar_role FROM usuario WHERE usuar_id=?");
-    $st->execute([$userId]);
-    $u = $st->fetch(PDO::FETCH_ASSOC);
-    if (!$u || $u['usuar_role'] !== 'admin') fail('Sem permissão');
-    return $userId;
-}
 /** @var string $action */
 if ($action === 'make_admin') {
     $targetId = (int)($_POST['targetId'] ?? 0);
@@ -66,6 +56,7 @@ if ($action === 'admin_resolve_report') {
 if ($action === 'stats_popular_interests') {
     requireAdmin();
     $db = db();
+    // Sub-interests with the most users
     $rows = $db->query("
         SELECT s.subinter_nome AS nome, i.inter_nome AS categoria, COUNT(ui.usint_usuar_id) AS total
         FROM subinteresse s
@@ -81,6 +72,7 @@ if ($action === 'stats_popular_interests') {
 if ($action === 'stats_uniting_interests') {
     requireAdmin();
     $db = db();
+    // Sub-interests shared by the most connected pairs
     $rows = $db->query("
         SELECT s.subinter_nome AS nome, i.inter_nome AS categoria, COUNT(*) AS conexoes
         FROM pedido_conexao pc
@@ -100,6 +92,7 @@ if ($action === 'stats_uniting_interests') {
 if ($action === 'stats_activity') {
     requireAdmin();
     $db = db();
+    // Messages per day for the last 14 days
     $rows = $db->query("
         SELECT DATE(post_data_envio) AS dia, COUNT(*) AS mensagens
         FROM post
@@ -107,7 +100,7 @@ if ($action === 'stats_activity') {
         GROUP BY dia
         ORDER BY dia ASC
     ")->fetchAll(PDO::FETCH_ASSOC);
-
+    // Fill in missing days with 0
     $map = [];
     foreach ($rows as $r) $map[$r['dia']] = (int)$r['mensagens'];
     $result = [];
@@ -121,6 +114,8 @@ if ($action === 'stats_activity') {
 if ($action === 'stats_registrations') {
     requireAdmin();
     $db = db();
+    // Use usuar_id ranges as proxy for registration order (no timestamp column)
+    // Instead show user count per role
     $rows = $db->query("
         SELECT usuar_role AS role, COUNT(*) AS total
         FROM usuario
@@ -132,6 +127,7 @@ if ($action === 'stats_registrations') {
 if ($action === 'stats_connections_over_time') {
     requireAdmin();
     $db = db();
+    // Connections per estado breakdown
     $rows = $db->query("
         SELECT pedcon_estado AS estado, COUNT(*) AS total
         FROM pedido_conexao
@@ -143,6 +139,7 @@ if ($action === 'stats_connections_over_time') {
 if ($action === 'stats_category_distribution') {
     requireAdmin();
     $db = db();
+    // How many user-interest entries per category
     $rows = $db->query("
         SELECT i.inter_nome AS categoria, COUNT(ui.usint_usuar_id) AS total
         FROM interesse i
@@ -157,6 +154,7 @@ if ($action === 'stats_category_distribution') {
 if ($action === 'stats_event_participation') {
     requireAdmin();
     $db = db();
+    // Confirmed vs pending vs declined across all events
     $rows = $db->query("
         SELECT invite_estado AS estado, COUNT(*) AS total
         FROM invite
@@ -168,6 +166,7 @@ if ($action === 'stats_event_participation') {
 if ($action === 'stats_top_users') {
     requireAdmin();
     $db = db();
+    // Users with most connections
     $rows = $db->query("
         SELECT u.usuar_nome AS nome, u.usuar_foto_perfil AS foto, COUNT(*) AS conexoes
         FROM pedido_conexao pc
@@ -185,7 +184,7 @@ if ($action === 'stats_descriptive') {
     requireAdmin();
     $db = db();
 
-
+    // ── 1. Conexões por utilizador (média, mediana, desvio padrão) ──────────
     $connPerUser = $db->query("
         SELECT u.usuar_id, COUNT(pc.pedcon_id) AS n
         FROM usuario u
@@ -222,6 +221,7 @@ if ($action === 'stats_descriptive') {
         GROUP BY pc.pedcon_id
     ")->fetchAll(PDO::FETCH_COLUMN);
 
+    // ── 2. Média de interesses por utilizador por categoria ──────────────────
     $interestPerCat = $db->query("
         SELECT i.inter_nome AS categoria,
                COUNT(ui.usint_usuar_id) AS total_entradas,
@@ -240,7 +240,7 @@ if ($action === 'stats_descriptive') {
         ];
     }
 
-
+    // ── 3. Interesse mais polarizador ────────────────────────────────────────
     $polarRows = $db->query("
         SELECT s.subinter_id, s.subinter_nome AS nome, i.inter_nome AS categoria,
                COUNT(DISTINCT ui.usint_usuar_id) AS utilizadores,
@@ -267,6 +267,7 @@ if ($action === 'stats_descriptive') {
         if ($score > $bestScore) { $bestScore = $score; $polarizador = $r; }
     }
 
+    // ── 4. Média de participantes por evento ─────────────────────────────────
     $eventStats = $db->query("
         SELECT AVG(cnt) AS media, MAX(cnt) AS maximo, MIN(cnt) AS minimo
         FROM (
@@ -276,6 +277,7 @@ if ($action === 'stats_descriptive') {
         ) sub
     ")->fetch(PDO::FETCH_ASSOC);
 
+    // ── 5. Média de mensagens por conversa ───────────────────────────────────
     $msgStats = $db->query("
         SELECT AVG(cnt) AS media, MAX(cnt) AS maximo,
                SUM(CASE WHEN cnt = 0 THEN 1 ELSE 0 END) AS sem_msgs
@@ -288,6 +290,7 @@ if ($action === 'stats_descriptive') {
         ) sub
     ")->fetch(PDO::FETCH_ASSOC);
 
+    // ── 6. Interesses vs conexões (bivariada) ────────────────────────────────
     $bivariada = $db->query("
         SELECT grupos.grupo,
                ROUND(AVG(grupos.conexoes), 2) AS media_conexoes,

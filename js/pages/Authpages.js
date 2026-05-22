@@ -107,7 +107,7 @@ login() {
         <div class="auth-left-glow auth-left-glow-2"></div>
         <div class="auth-left-glow auth-left-glow-3"></div>
         <div class="auth-left-logo">
-          <img src="uploads/MoodlyLogo.png" alt="Moodly"/>Mood<span style="color:var(--yellow)">ly</span>
+          <img src="uploads/MoodlyLogo.png" alt="Moodly"/>Mood<span class="logo-highlight">ly</span>
         </div>
         <div class="auth-left-body">
           <div class="auth-left-tagline">
@@ -173,7 +173,7 @@ login() {
         <div class="auth-left-glow auth-left-glow-2"></div>
         <div class="auth-left-glow auth-left-glow-3"></div>
         <div class="auth-left-logo">
-          <img src="uploads/MoodlyLogo.png" alt="Moodly"/>Mood<span style="color:var(--yellow)">ly</span>
+          <img src="uploads/MoodlyLogo.png" alt="Moodly"/>Mood<span class="logo-highlight">ly</span>
         </div>
         <div class="auth-left-body">
           <div class="auth-left-tagline">
@@ -249,7 +249,7 @@ login() {
         <div class="auth-left-glow auth-left-glow-2"></div>
         <div class="auth-left-glow auth-left-glow-3"></div>
         <div class="auth-left-logo">
-          <img src="uploads/MoodlyLogo.png" alt="Moodly"/>Mood<span style="color:var(--yellow)">ly</span>
+          <img src="uploads/MoodlyLogo.png" alt="Moodly"/>Mood<span class="logo-highlight">ly</span>
         </div>
         <div class="auth-left-body">
           <div class="auth-left-tagline">
@@ -299,7 +299,7 @@ login() {
         <div class="auth-left-glow auth-left-glow-2"></div>
         <div class="auth-left-glow auth-left-glow-3"></div>
         <div class="auth-left-logo">
-          <img src="uploads/MoodlyLogo.png" alt="Moodly"/>Mood<span style="color:var(--yellow)">ly</span>
+          <img src="uploads/MoodlyLogo.png" alt="Moodly"/>Mood<span class="logo-highlight">ly</span>
         </div>
         <div class="auth-left-body">
           <div class="auth-left-tagline">

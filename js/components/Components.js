@@ -48,12 +48,23 @@ const Components = {
       items.push({ id: 'stats', label: 'Estatísticas' });
     }
     return `
+      <div class="mobile-topbar">
+        <div class="sidebar-logo">
+          <img src="uploads/MoodlyLogo.png" alt="Moodly" class="logo-img"/><span class="logo-text">Mood<span class="logo-highlight">ly</span></span>
+        </div>
+        <button class="hamburger" onclick="Components.toggleMenu()" aria-label="Menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+      <div class="menu-overlay" onclick="Components.closeMenu()"></div>
       <aside class="sidebar">
-        <div class="sidebar-logo"><img src="uploads/MoodlyLogo.png" alt="Moodly" class="logo-img"/>Mood<span style="color:var(--yellow)">ly</span></div>
+        <div class="sidebar-logo">
+          <img src="uploads/MoodlyLogo.png" alt="Moodly" class="logo-img"/><span class="logo-text">Mood<span class="logo-highlight">ly</span></span>
+        </div>
         <nav class="nav">
           ${items.map(item => `
             <div class="nav-item ${activePage === item.id ? 'active' : ''}"
-                 onclick="App.navigate('${item.id}')">
+                 onclick="App.navigate('${item.id}'); Components.closeMenu()">
               ${item.label}
             </div>
           `).join('')}
@@ -63,7 +74,22 @@ const Components = {
   },
 
   shell(content, activePage) {
-    return Components.sidebar(activePage) + `<div class="main">${content}</div>`;
+    const isChats = activePage === 'chats';
+    return Components.sidebar(activePage) + (isChats
+      ? content
+      : `<div class="main">${content}</div>`);
+  },
+
+  toggleMenu() {
+    document.querySelector('.sidebar')?.classList.toggle('open');
+    document.querySelector('.menu-overlay')?.classList.toggle('show');
+    document.querySelector('.hamburger')?.classList.toggle('open');
+  },
+
+  closeMenu() {
+    document.querySelector('.sidebar')?.classList.remove('open');
+    document.querySelector('.menu-overlay')?.classList.remove('show');
+    document.querySelector('.hamburger')?.classList.remove('open');
   },
 
   toast(message, type = 'info') {

@@ -28,7 +28,7 @@ const HomePage = {
 
     const html = Components.shell(`
       <div class="page-header">
-        <div><h1>Descobrir</h1><p>Encontra Moodlers com os teus gostos</p></div>
+        <div><h1>Descobrir</h1><p>Encontra pessoas com os teus gostos</p></div>
         <input type="text" placeholder="Pesquisar utilizadores..."
                style="width:220px;" oninput="HomePage.search(this.value)"/>
       </div>
@@ -38,9 +38,9 @@ const HomePage = {
       <div style="display:grid;grid-template-columns:1fr 260px;gap:20px;align-items:start;">
 
         <div class="card" style="padding:0;overflow:hidden;">
-          <div style="height:100px;background:linear-gradient(135deg,#3b0070,#1a0040);"></div>
+          <div style="height:130px;background:linear-gradient(135deg,#3b0070,#1a0040);"></div>
           <div style="padding:0 20px 20px;">
-            <div style="width:76px;height:76px;border-radius:50%;background:#5b21b6;border:4px solid var(--panel);display:flex;align-items:center;justify-content:center;font-size:1.6rem;font-weight:800;overflow:hidden;margin:-38px 0 12px;position:relative;z-index:1;">
+            <div style="width:100px;height:100px;border-radius:50%;background:#5b21b6;border:4px solid var(--panel);display:flex;align-items:center;justify-content:center;font-size:2.2rem;font-weight:800;overflow:hidden;margin:-50px 0 14px;position:relative;z-index:1;">
               ${photo ? `<img src="${photo}" style="width:100%;height:100%;object-fit:cover;"/>` : inits}
             </div>
             <div style="font-size:1.15rem;font-weight:800;color:#fff;margin-bottom:3px;">${user.usuar_nome}</div>

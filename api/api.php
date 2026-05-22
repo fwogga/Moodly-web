@@ -1,7 +1,5 @@
 <?php
 session_start();
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
 require_once __DIR__ . '/db.php';
 
 header('Content-Type: application/json');
@@ -16,15 +14,78 @@ function requireLogin() {
     fail('Não autenticado');
 }
 
+function requireAdmin() {
+    $userId = requireLogin();
+    $st = db()->prepare("SELECT usuar_role FROM usuario WHERE usuar_id = ?");
+    $st->execute([$userId]);
+    $u = $st->fetch(PDO::FETCH_ASSOC);
+    if (($u['usuar_role'] ?? '') !== 'admin') fail('Sem permissão');
+    return $userId;
+}
+
 $action = $_POST['action'] ?? $_GET['action'] ?? '';
 
-require_once __DIR__ . DIRECTORY_SEPARATOR . 'actions' . DIRECTORY_SEPARATOR . 'auth.php';
-require_once __DIR__ . DIRECTORY_SEPARATOR . 'actions' . DIRECTORY_SEPARATOR . 'users.php';
-require_once __DIR__ . DIRECTORY_SEPARATOR . 'actions' . DIRECTORY_SEPARATOR . 'interests.php';
-require_once __DIR__ . DIRECTORY_SEPARATOR . 'actions' . DIRECTORY_SEPARATOR . 'connections.php';
-require_once __DIR__ . DIRECTORY_SEPARATOR . 'actions' . DIRECTORY_SEPARATOR . 'events.php';
-require_once __DIR__ . DIRECTORY_SEPARATOR . 'actions' . DIRECTORY_SEPARATOR . 'chats.php';
-require_once __DIR__ . DIRECTORY_SEPARATOR . 'actions' . DIRECTORY_SEPARATOR . 'reports.php';
-require_once __DIR__ . DIRECTORY_SEPARATOR . 'actions' . DIRECTORY_SEPARATOR . 'admin.php';
+$routes = [
+    'register'                   => 'auth',
+    'login'                      => 'auth',
+    'logout'                     => 'auth',
+    'check_session'              => 'auth',
+
+    'discover'                   => 'users',
+    'search_users'               => 'users',
+    'get_profile'                => 'users',
+    'update_profile'             => 'users',
+    'upload_photo'               => 'users',
+
+    'get_interests'              => 'interests',
+    'search_interests'           => 'interests',
+    'find_or_create_interest'    => 'interests',
+    'set_interests'              => 'interests',
+
+    'get_connections'            => 'connections',
+    'get_sent_requests'          => 'connections',
+    'get_new_connections'        => 'connections',
+    'send_request'               => 'connections',
+    'accept_request'             => 'connections',
+    'reject_request'             => 'connections',
+
+    'get_events'                 => 'events',
+    'get_map_events'             => 'events',
+    'create_event'               => 'events',
+    'invite_to_event'            => 'events',
+    'accept_event'               => 'events',
+    'decline_event'              => 'events',
+    'cancel_event'               => 'events',
+    'delete_event'               => 'events',
+    'get_event_detail'           => 'events',
+
+    'get_chats'                  => 'chats',
+    'get_messages'               => 'chats',
+    'send_message'               => 'chats',
+    'get_event_messages'         => 'chats',
+    'send_event_message'         => 'chats',
+
+    'report_user'                => 'reports',
+
+    'make_admin'                 => 'admin',
+    'admin_get_users'            => 'admin',
+    'admin_ban'                  => 'admin',
+    'admin_stats'                => 'admin',
+    'admin_get_reports'          => 'admin',
+    'admin_resolve_report'       => 'admin',
+    'stats_popular_interests'    => 'admin',
+    'stats_uniting_interests'    => 'admin',
+    'stats_activity'             => 'admin',
+    'stats_registrations'        => 'admin',
+    'stats_connections_over_time'=> 'admin',
+    'stats_category_distribution'=> 'admin',
+    'stats_event_participation'  => 'admin',
+    'stats_top_users'            => 'admin',
+    'stats_descriptive'          => 'admin',
+];
+
+if (!isset($routes[$action])) fail('Ação desconhecida: ' . $action);
+
+require_once __DIR__ . '/actions/' . $routes[$action] . '.php';
 
 fail('Ação desconhecida: ' . $action);

@@ -341,7 +341,17 @@ const EventsPage = {
   },
 
   async cancel(eventId) {
-    if (!confirm('Cancelar este evento?')) return;
+    Components.modal(`
+      <h3>Cancelar evento</h3>
+      <p style="color:var(--dim);font-size:0.88rem;margin-bottom:4px;">Tens a certeza? Todos os convites serão cancelados.</p>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="Components.closeModal()">Voltar</button>
+        <button class="btn btn-danger" onclick="Components.closeModal(); EventsPage._doCancel(${eventId});">Cancelar evento</button>
+      </div>
+    `);
+  },
+
+  async _doCancel(eventId) {
     const res = await App.api('cancel_event', { eventId });
     if (res.ok) { Components.toast('Evento cancelado.', 'info'); App.state.eventsLoaded = false; App.navigate('events'); }
     else Components.toast(res.error, 'error');
