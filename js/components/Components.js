@@ -4,7 +4,7 @@ const Components = {
     const initials = (name || '?').split(' ').map(w => w[0]).slice(0,2).join('').toUpperCase();
     const fs = Math.round(size * 0.38);
     if (photoUrl) {
-      return `<div class="avatar" style="width:${size}px;height:${size}px;"><img src="${photoUrl}" alt="${initials}"/></div>`;
+      return `<div class="avatar" style="width:${size}px;height:${size}px;overflow:hidden;"><img src="${photoUrl}" alt="${initials}" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML='<span style=font-size:${fs}px>${initials}</span>';"/></div>`;
     }
     return `<div class="avatar" style="width:${size}px;height:${size}px;font-size:${fs}px;">${initials}</div>`;
   },
@@ -13,21 +13,17 @@ const Components = {
     const cats = { 'Música': [], 'Jogos': [], 'Cinema & Séries': [] };
     (interests || []).forEach(t => {
       const cat = t.categoria;
-      if (cats[cat]) cats[cat].push(t.tag || t.nome);
-      else {
-        const first = Object.keys(cats)[0];
-        cats[first].push(t.tag || t.nome);
-      }
+      if (cats[cat]) cats[cat].push(t);
+      else cats[Object.keys(cats)[0]].push(t);
     });
 
-    const labels = { 'Música': 'Música', 'Jogos': 'Jogos', 'Cinema & Séries': 'Cinema & Séries' };
     return `<div class="interest-categories">
       ${Object.entries(cats).map(([cat, tags]) => `
         <div class="interest-cat">
-          <div class="interest-cat-label">${labels[cat]}</div>
+          <div class="interest-cat-label">${cat}</div>
           <div class="interest-cat-tags">
             ${tags.length
-              ? tags.map(t => `<span class="itag">${t}</span>`).join('')
+              ? tags.map(t => `<span class="itag${t.matched == 1 ? ' itag-match' : ''}">${t.tag || t.nome}</span>`).join('')
               : `<span style="color:var(--dim);font-size:0.78rem;">—</span>`
             }
           </div>

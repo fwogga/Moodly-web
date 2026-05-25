@@ -10,15 +10,16 @@ const StatsPage = {
     const html = Components.shell(`
       <div class="page-header">
         <div><h1>Estatísticas</h1><p>Painel de análise para decisões sobre a plataforma</p></div>
+        <button class="btn btn-outline btn-sm" onclick="StatsPage.exportPDF()">Exportar PDF</button>
       </div>
 
-      <!-- KPI row: Utilizadores -->
+      <!-- Utilizadores -->
       ${section('Utilizadores')}
       <div id="stats-kpis-users" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:4px;">
         <div style="color:var(--dim);font-size:0.82rem;">A carregar...</div>
       </div>
 
-      <!-- KPI row: Atividade -->
+      <!-- Atividade -->
       ${section('Atividade')}
       <div id="stats-kpis-activity" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:4px;">
         <div style="color:var(--dim);font-size:0.82rem;">A carregar...</div>
@@ -146,6 +147,30 @@ const StatsPage = {
     if (descRes.ok)   StatsPage._drawCorrelation(descRes.data);
     if (descRes.ok)   StatsPage._renderPolarizador(descRes.data);
     if (descRes.ok)   StatsPage._drawHistograms(descRes.data);
+
+    window.onbeforeprint = () => StatsPage._applyPrintColors(true);
+    window.onafterprint  = () => StatsPage._applyPrintColors(false);
+  },
+
+  exportPDF() {
+    window.print();
+  },
+
+  _applyPrintColors(dark) {
+    const color = dark ? '#111111' : 'rgba(255,255,255,0.6)';
+    if (typeof Chart === 'undefined') return;
+    Chart.helpers.each(Chart.instances, chart => {
+      if (chart.options.plugins?.legend?.labels) {
+        chart.options.plugins.legend.labels.color = color;
+      }
+      if (chart.options.scales) {
+        Object.values(chart.options.scales).forEach(scale => {
+          if (scale.ticks) scale.ticks.color = dark ? '#444444' : 'rgba(255,255,255,0.4)';
+          if (scale.grid)  scale.grid.color  = dark ? '#dddddd' : 'rgba(255,255,255,0.05)';
+        });
+      }
+      chart.update('none');
+    });
   },
 
   _renderKPIs(g, actData) {
@@ -205,7 +230,7 @@ const StatsPage = {
       StatsPage._row('P25 / P75',      `${c.p25 ?? '—'} / ${c.p75 ?? '—'}`, 'percentis'),
       StatsPage._row('IC 95% da média', ci95(c.media, c.desvio, c.n ?? 10), ''),
       `<div style="margin-top:10px;font-size:0.75rem;color:var(--dim2);line-height:1.6;">
-        ${c.desvio > c.media ? 'Desvio padrão elevado e distribuição assimétrica. Alguns utilizadores têm muito mais conexões que a maioria.' : 'Distribuição relativamente homogénea entre utilizadores.'}
+        ${c.desvio > c.media ? 'Desvio padrão elevado — distribuição assimétrica. Alguns utilizadores têm muito mais conexões que a maioria.' : 'Distribuição relativamente homogénea entre utilizadores.'}
       </div>`,
     ].join('');
 
@@ -258,8 +283,8 @@ const StatsPage = {
       const first = parseFloat(d.bivariada[0]?.media_conexoes || 0);
       const last  = parseFloat(d.bivariada[d.bivariada.length - 1]?.media_conexoes || 0);
       corrEl.textContent = last > first
-        ? `Correlação positiva, utilizadores com mais interesses tendem a ter mais conexões.`
-        : `Correlação não clara, mais interesses não implica necessariamente mais conexões.`;
+        ? `Correlação positiva — utilizadores com mais interesses tendem a ter mais conexões.`
+        : `Correlação não clara — mais interesses não implica necessariamente mais conexões.`;
     }
   },
 
@@ -277,7 +302,7 @@ const StatsPage = {
       ${StatsPage._row('Conexões que partilham este interesse', p.conexoes)}
       ${StatsPage._row('Taxa de conversão', taxa + '%', 'utilizadores → conexão')}
       <div style="margin-top:12px;font-size:0.78rem;color:var(--dim2);line-height:1.6;">
-        Este interesse é popular mas converte poucas conexões. Pode indicar que os utilizadores têm gostos em comum mas não se conectam. Considera destacá-lo no algoritmo de descoberta.
+        Este interesse é popular mas converte poucas conexões, pode indicar que os utilizadores têm gostos em comum mas não se conectam.
       </div>`;
   },
 

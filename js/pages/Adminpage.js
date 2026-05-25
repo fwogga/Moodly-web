@@ -23,15 +23,13 @@ const AdminPage = {
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;">
 
-        <!-- user -->
+        <!-- users -->
         <div>
           <div style="font-weight:700;margin-bottom:8px;">Utilizadores</div>
-          <input type="text" placeholder="Pesquisar por nome..."
+          <input type="text" placeholder="Pesquisar por nome ou #ID..."
                  style="width:100%;margin-bottom:8px;"
                  oninput="AdminPage.searchUsers(this.value)"/>
-          <div id="admin-user-results">
-            ${AdminPage.renderUserRows(App.state.adminUsers || [])}
-          </div>
+          <div id="admin-user-results"></div>
         </div>
 
         <!-- reporte -->
@@ -91,27 +89,30 @@ const AdminPage = {
   },
 
   async load() {
-    const [statsRes, usersRes, reportsRes] = await Promise.all([
+    const [statsRes, reportsRes] = await Promise.all([
       App.api('admin_stats',       {}, 'GET'),
-      App.api('admin_get_users',   {}, 'GET'),
       App.api('admin_get_reports', {}, 'GET'),
     ]);
     if (statsRes.ok)   App.state.adminStats   = statsRes.data;
-    if (usersRes.ok)   App.state.adminUsers   = usersRes.data;
     if (reportsRes.ok) App.state.adminReports = reportsRes.data;
     App.render();
   },
 
+  _searchTimer: null,
+
   async searchUsers(q) {
     const el = document.getElementById('admin-user-results');
     if (!el) return;
-    const lower = q.toLowerCase();
-    const filtered = (App.state.adminUsers || []).filter(u =>
-      u.usuar_nome.toLowerCase().includes(lower) ||
-      u.usuar_email.toLowerCase().includes(lower) ||
-      String(u.usuar_id) === q.trim()
-    );
-    el.innerHTML = AdminPage.renderUserRows(filtered);
+    q = q.trim();
+    if (!q) { el.innerHTML = `<p style="color:var(--dim);font-size:0.82rem;">Escreve um nome ou ID para pesquisar.</p>`; return; }
+    clearTimeout(AdminPage._searchTimer);
+    AdminPage._searchTimer = setTimeout(async () => {
+      el.innerHTML = `<p style="color:var(--dim);font-size:0.82rem;">A pesquisar...</p>`;
+      const res = await App.api('admin_get_users', { q }, 'GET');
+      if (!res.ok) { el.innerHTML = `<p style="color:var(--red);">${res.error}</p>`; return; }
+      App.state.adminUsers = res.data;
+      el.innerHTML = AdminPage.renderUserRows(res.data);
+    }, 300);
   },
 
   async showUserProfile(userId) {

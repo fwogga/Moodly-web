@@ -36,6 +36,7 @@ $routes = [
     'get_profile'                => 'users',
     'update_profile'             => 'users',
     'upload_photo'               => 'users',
+    'upload_photo_cropped'       => 'users',
 
     'get_interests'              => 'interests',
     'search_interests'           => 'interests',
