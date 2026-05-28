@@ -1,0 +1,410 @@
+USE moodly;
+
+SET FOREIGN_KEY_CHECKS = 0;
+TRUNCATE TABLE admin_log;
+TRUNCATE TABLE user_report;
+TRUNCATE TABLE group_post;
+TRUNCATE TABLE invite;
+TRUNCATE TABLE evento;
+TRUNCATE TABLE post;
+TRUNCATE TABLE pedido_conexao;
+TRUNCATE TABLE usuario_interesse;
+TRUNCATE TABLE subinteresse;
+TRUNCATE TABLE interesse;
+TRUNCATE TABLE usuario;
+SET FOREIGN_KEY_CHECKS = 1;
+
+ALTER TABLE interesse       AUTO_INCREMENT = 1;
+ALTER TABLE subinteresse    AUTO_INCREMENT = 1;
+ALTER TABLE usuario         AUTO_INCREMENT = 1;
+ALTER TABLE pedido_conexao  AUTO_INCREMENT = 1;
+ALTER TABLE evento          AUTO_INCREMENT = 1;
+
+-- ── INTERESSES ──────────────────────────────────────────────────
+INSERT INTO interesse (inter_id, inter_nome) VALUES
+(1, 'Música'),
+(2, 'Jogos'),
+(3, 'Cinema & Séries');
+
+INSERT INTO subinteresse (subinter_id, subinter_inter_id, subinter_nome) VALUES
+(1,  1, 'Arctic Monkeys'),
+(2,  1, 'Bring Me The Horizon'),
+(3,  1, 'Radiohead'),
+(4,  1, 'Billie Eilish'),
+(5,  1, 'Drake'),
+(6,  1, 'Kendrick Lamar'),
+(7,  1, 'Tame Impala'),
+(8,  1, 'The Weeknd'),
+(9,  1, 'Bad Bunny'),
+(10, 1, 'Dua Lipa'),
+(11, 1, 'Tyler the Creator'),
+(12, 1, 'Lana Del Rey'),
+(13, 1, 'Frank Ocean'),
+(14, 1, 'Adele'),
+(15, 1, 'Post Malone'),
+(16, 1, 'Daft Punk'),
+(17, 1, 'Gorillaz'),
+(18, 1, 'Foo Fighters'),
+(19, 1, 'Red Hot Chili Peppers'),
+(20, 1, 'Nirvana'),
+(21, 1, 'Linkin Park'),
+(22, 1, 'Eminem'),
+(23, 1, 'Jay-Z'),
+(24, 1, 'Coldplay'),
+(25, 1, 'Ed Sheeran'),
+
+-- Jogos (26-50)
+(26, 2, 'Elden Ring'),
+(27, 2, 'Minecraft'),
+(28, 2, 'FIFA'),
+(29, 2, 'Fortnite'),
+(30, 2, 'League of Legends'),
+(31, 2, 'Cyberpunk 2077'),
+(32, 2, 'The Last of Us'),
+(33, 2, 'God of War'),
+(34, 2, 'Red Dead Redemption 2'),
+(35, 2, 'GTA V'),
+(36, 2, 'Valorant'),
+(37, 2, 'Counter-Strike 2'),
+(38, 2, 'Celeste'),
+(39, 2, 'Hollow Knight'),
+(40, 2, 'Hades'),
+(41, 2, 'Baldur''s Gate 3'),
+(42, 2, 'Stardew Valley'),
+(43, 2, 'Zelda: Breath of the Wild'),
+(44, 2, 'Dark Souls'),
+(45, 2, 'Sekiro'),
+(46, 2, 'Overwatch'),
+(47, 2, 'Apex Legends'),
+(48, 2, 'Rocket League'),
+(49, 2, 'Dead by Daylight'),
+(50, 2, 'Among Us'),
+
+-- Cinema & Séries (51-75)
+(51, 3, 'Breaking Bad'),
+(52, 3, 'Succession'),
+(53, 3, 'Stranger Things'),
+(54, 3, 'The Bear'),
+(55, 3, 'Inception'),
+(56, 3, 'Interstellar'),
+(57, 3, 'The Dark Knight'),
+(58, 3, 'Pulp Fiction'),
+(59, 3, 'La Casa de Papel'),
+(60, 3, 'Peaky Blinders'),
+(61, 3, 'Better Call Saul'),
+(62, 3, 'The Office'),
+(63, 3, 'Friends'),
+(64, 3, 'Game of Thrones'),
+(65, 3, 'The Wire'),
+(66, 3, 'Avatar'),
+(67, 3, 'Dune'),
+(68, 3, 'Oppenheimer'),
+(69, 3, 'Parasite'),
+(70, 3, 'The Shawshank Redemption'),
+(71, 3, 'Whiplash'),
+(72, 3, 'Hereditary'),
+(73, 3, 'Midsommar'),
+(74, 3, 'Everything Everywhere All at Once'),
+(75, 3, 'Severance');
+
+-- ── UTILIZADORES ────────────────────────────────────────────────
+-- pw: 123456 => $2y$10$xs5hHX7Hhw6cB6ugazfKfu77ey0ODM4DOPminmJjAp0GHlAPq7zza
+INSERT INTO usuario (usuar_id, usuar_nome, usuar_email, usuar_senha_hash, usuar_foto_perfil, usuar_role, usuar_banned) VALUES
+(1,  'Admin',            'admin@moodly.pt',      '$2y$10$xs5hHX7Hhw6cB6ugazfKfu77ey0ODM4DOPminmJjAp0GHlAPq7zza', 'uploads/user_1.jpg',  'admin', 0),
+(2,  'Deuwer Santos',    'deuwer@moodly.pt',     '$2y$10$xs5hHX7Hhw6cB6ugazfKfu77ey0ODM4DOPminmJjAp0GHlAPq7zza', 'uploads/user_2.jpg',  'user',  0),
+(3,  'Beatriz Costa',    'beatriz@moodly.pt',    '$2y$10$xs5hHX7Hhw6cB6ugazfKfu77ey0ODM4DOPminmJjAp0GHlAPq7zza', 'uploads/user_3.jpg',  'user',  0),
+(4,  'Rui Pereira',      'rui@moodly.pt',        '$2y$10$xs5hHX7Hhw6cB6ugazfKfu77ey0ODM4DOPminmJjAp0GHlAPq7zza', 'uploads/user_4.jpg',  'user',  0),
+(5,  'Ana Silva',        'ana@moodly.pt',        '$2y$10$xs5hHX7Hhw6cB6ugazfKfu77ey0ODM4DOPminmJjAp0GHlAPq7zza', 'uploads/user_5.jpg',  'user',  0),
+(6,  'Miguel Ferreira',  'miguel@moodly.pt',     '$2y$10$xs5hHX7Hhw6cB6ugazfKfu77ey0ODM4DOPminmJjAp0GHlAPq7zza', 'uploads/user_6.jpg',  'user',  0),
+(7,  'Sofia Rodrigues',  'sofia@moodly.pt',      '$2y$10$xs5hHX7Hhw6cB6ugazfKfu77ey0ODM4DOPminmJjAp0GHlAPq7zza', 'uploads/user_7.jpg',  'user',  0),
+(8,  'João Santos',      'joao@moodly.pt',       '$2y$10$xs5hHX7Hhw6cB6ugazfKfu77ey0ODM4DOPminmJjAp0GHlAPq7zza', 'uploads/user_8.jpg',  'user',  0),
+(9,  'Inês Rodrigues',   'ines@moodly.pt',       '$2y$10$xs5hHX7Hhw6cB6ugazfKfu77ey0ODM4DOPminmJjAp0GHlAPq7zza', 'uploads/user_9.jpg',  'user',  0),
+(10, 'Tomás Ferreira',   'tomas@moodly.pt',      '$2y$10$xs5hHX7Hhw6cB6ugazfKfu77ey0ODM4DOPminmJjAp0GHlAPq7zza', 'uploads/user_10.jpg', 'user',  0),
+(11, 'Mariana Costa',    'mariana@moodly.pt',    '$2y$10$xs5hHX7Hhw6cB6ugazfKfu77ey0ODM4DOPminmJjAp0GHlAPq7zza', 'https://i.pravatar.cc/150?img=47', 'user', 0),
+(12, 'Diogo Martins',    'diogo@moodly.pt',      '$2y$10$xs5hHX7Hhw6cB6ugazfKfu77ey0ODM4DOPminmJjAp0GHlAPq7zza', 'https://i.pravatar.cc/150?img=11', 'user', 0),
+(13, 'Catarina Lopes',   'catarina@moodly.pt',   '$2y$10$xs5hHX7Hhw6cB6ugazfKfu77ey0ODM4DOPminmJjAp0GHlAPq7zza', 'https://i.pravatar.cc/150?img=44', 'user', 0),
+(14, 'Francisco Neves',  'francisco@moodly.pt',  '$2y$10$xs5hHX7Hhw6cB6ugazfKfu77ey0ODM4DOPminmJjAp0GHlAPq7zza', 'https://i.pravatar.cc/150?img=15', 'user', 0),
+(15, 'Leonor Faria',     'leonor@moodly.pt',     '$2y$10$xs5hHX7Hhw6cB6ugazfKfu77ey0ODM4DOPminmJjAp0GHlAPq7zza', 'https://i.pravatar.cc/150?img=49', 'user', 0),
+(16, 'Gonçalo Sousa',    'goncalo@moodly.pt',    '$2y$10$xs5hHX7Hhw6cB6ugazfKfu77ey0ODM4DOPminmJjAp0GHlAPq7zza', 'https://i.pravatar.cc/150?img=18', 'user', 0),
+(17, 'Matilde Serra',    'matilde@moodly.pt',    '$2y$10$xs5hHX7Hhw6cB6ugazfKfu77ey0ODM4DOPminmJjAp0GHlAPq7zza', 'https://i.pravatar.cc/150?img=45', 'user', 0),
+(18, 'Rodrigo Pinto',    'rodrigo@moodly.pt',    '$2y$10$xs5hHX7Hhw6cB6ugazfKfu77ey0ODM4DOPminmJjAp0GHlAPq7zza', 'https://i.pravatar.cc/150?img=12', 'user', 0),
+(19, 'Marta Oliveira',   'marta@moodly.pt',      '$2y$10$xs5hHX7Hhw6cB6ugazfKfu77ey0ODM4DOPminmJjAp0GHlAPq7zza', 'https://i.pravatar.cc/150?img=48', 'user', 0),
+(20, 'Afonso Ribeiro',   'afonso@moodly.pt',     '$2y$10$xs5hHX7Hhw6cB6ugazfKfu77ey0ODM4DOPminmJjAp0GHlAPq7zza', 'https://i.pravatar.cc/150?img=13', 'user', 0),
+(21, 'Constança Lima',   'constanca@moodly.pt',  '$2y$10$xs5hHX7Hhw6cB6ugazfKfu77ey0ODM4DOPminmJjAp0GHlAPq7zza', 'https://i.pravatar.cc/150?img=46', 'user', 0),
+(22, 'Henrique Dias',    'henrique@moodly.pt',   '$2y$10$xs5hHX7Hhw6cB6ugazfKfu77ey0ODM4DOPminmJjAp0GHlAPq7zza', 'https://i.pravatar.cc/150?img=3',  'user', 0),
+(23, 'Filipa Mendes',    'filipa@moodly.pt',     '$2y$10$xs5hHX7Hhw6cB6ugazfKfu77ey0ODM4DOPminmJjAp0GHlAPq7zza', 'https://i.pravatar.cc/150?img=43', 'user', 0),
+(24, 'Vasco Carvalho',   'vasco@moodly.pt',      '$2y$10$xs5hHX7Hhw6cB6ugazfKfu77ey0ODM4DOPminmJjAp0GHlAPq7zza', 'https://i.pravatar.cc/150?img=14', 'user', 0),
+(25, 'Benedita Soares',  'benedita@moodly.pt',   '$2y$10$xs5hHX7Hhw6cB6ugazfKfu77ey0ODM4DOPminmJjAp0GHlAPq7zza', 'https://i.pravatar.cc/150?img=41', 'user', 0),
+(26, 'Lourenço Vieira',  'lourenco@moodly.pt',   '$2y$10$xs5hHX7Hhw6cB6ugazfKfu77ey0ODM4DOPminmJjAp0GHlAPq7zza', 'https://i.pravatar.cc/150?img=16', 'user', 0),
+(27, 'Vitória Campos',   'vitoria@moodly.pt',    '$2y$10$xs5hHX7Hhw6cB6ugazfKfu77ey0ODM4DOPminmJjAp0GHlAPq7zza', 'https://i.pravatar.cc/150?img=42', 'user', 0),
+(28, 'Simão Teixeira',   'simao@moodly.pt',      '$2y$10$xs5hHX7Hhw6cB6ugazfKfu77ey0ODM4DOPminmJjAp0GHlAPq7zza', 'https://i.pravatar.cc/150?img=19', 'user', 1),
+(29, 'Núria Azevedo',    'nuria@moodly.pt',      '$2y$10$xs5hHX7Hhw6cB6ugazfKfu77ey0ODM4DOPminmJjAp0GHlAPq7zza', 'https://i.pravatar.cc/150?img=40', 'user', 0),
+(30, 'Tomé Fonseca',     'tome@moodly.pt',       '$2y$10$xs5hHX7Hhw6cB6ugazfKfu77ey0ODM4DOPminmJjAp0GHlAPq7zza', 'https://i.pravatar.cc/150?img=7',  'user', 0);
+
+-- ── INTERESSES POR UTILIZADOR (variados: 0 a 11) ───────────────
+-- user 1 Admin: 6
+INSERT INTO usuario_interesse (usint_usuar_id, usint_subinter_id) VALUES
+(1,1),(1,26),(1,51),(1,52),(1,3),(1,33);
+-- user 2 Deuwer: 8 (heavy gamer + music)
+INSERT INTO usuario_interesse (usint_usuar_id, usint_subinter_id) VALUES
+(2,1),(2,2),(2,26),(2,27),(2,30),(2,36),(2,37),(2,51);
+-- user 3 Beatriz: 7
+INSERT INTO usuario_interesse (usint_usuar_id, usint_subinter_id) VALUES
+(3,3),(3,12),(3,51),(3,52),(3,53),(3,60),(3,67);
+-- user 4 Rui: 5
+INSERT INTO usuario_interesse (usint_usuar_id, usint_subinter_id) VALUES
+(4,1),(4,20),(4,26),(4,44),(4,65);
+-- user 5 Ana: 9
+INSERT INTO usuario_interesse (usint_usuar_id, usint_subinter_id) VALUES
+(5,4),(5,10),(5,12),(5,14),(5,51),(5,53),(5,62),(5,63),(5,74);
+-- user 6 Miguel: 6
+INSERT INTO usuario_interesse (usint_usuar_id, usint_subinter_id) VALUES
+(6,1),(6,5),(6,26),(6,31),(6,55),(6,68);
+-- user 7 Sofia: 7
+INSERT INTO usuario_interesse (usint_usuar_id, usint_subinter_id) VALUES
+(7,4),(7,10),(7,12),(7,53),(7,63),(7,74),(7,75);
+-- user 8 João: 4
+INSERT INTO usuario_interesse (usint_usuar_id, usint_subinter_id) VALUES
+(8,26),(8,30),(8,37),(8,64);
+-- user 9 Inês: 3 (low interests)
+INSERT INTO usuario_interesse (usint_usuar_id, usint_subinter_id) VALUES
+(9,5),(9,63),(9,59);
+-- user 10 Tomás: 5
+INSERT INTO usuario_interesse (usint_usuar_id, usint_subinter_id) VALUES
+(10,20),(10,26),(10,44),(10,58),(10,65);
+-- user 11 Mariana: 10
+INSERT INTO usuario_interesse (usint_usuar_id, usint_subinter_id) VALUES
+(11,1),(11,3),(11,7),(11,12),(11,51),(11,52),(11,53),(11,60),(11,61),(11,75);
+-- user 12 Diogo: 11 (maximum interests)
+INSERT INTO usuario_interesse (usint_usuar_id, usint_subinter_id) VALUES
+(12,2),(12,5),(12,6),(12,8),(12,26),(12,27),(12,30),(12,36),(12,40),(12,41),(12,64);
+-- user 13 Catarina: 4
+INSERT INTO usuario_interesse (usint_usuar_id, usint_subinter_id) VALUES
+(13,4),(13,10),(13,53),(13,66);
+-- user 14 Francisco: 8
+INSERT INTO usuario_interesse (usint_usuar_id, usint_subinter_id) VALUES
+(14,6),(14,11),(14,22),(14,23),(14,35),(14,47),(14,58),(14,68);
+-- user 15 Leonor: 6
+INSERT INTO usuario_interesse (usint_usuar_id, usint_subinter_id) VALUES
+(15,12),(15,14),(15,24),(15,52),(15,54),(15,71);
+-- user 16 Gonçalo: 9
+INSERT INTO usuario_interesse (usint_usuar_id, usint_subinter_id) VALUES
+(16,2),(16,17),(16,19),(16,20),(16,21),(16,26),(16,44),(16,57),(16,70);
+-- user 17 Matilde: 5
+INSERT INTO usuario_interesse (usint_usuar_id, usint_subinter_id) VALUES
+(17,4),(17,7),(17,10),(17,74),(17,75);
+-- user 18 Rodrigo: 7
+INSERT INTO usuario_interesse (usint_usuar_id, usint_subinter_id) VALUES
+(18,1),(18,8),(18,16),(18,26),(18,31),(18,56),(18,68);
+-- user 19 Marta: 3 (low interests)
+INSERT INTO usuario_interesse (usint_usuar_id, usint_subinter_id) VALUES
+(19,63),(19,62),(19,25);
+-- user 20 Afonso: 8
+INSERT INTO usuario_interesse (usint_usuar_id, usint_subinter_id) VALUES
+(20,5),(20,6),(20,22),(20,29),(20,35),(20,46),(20,47),(20,68);
+-- user 21 Constança: 6
+INSERT INTO usuario_interesse (usint_usuar_id, usint_subinter_id) VALUES
+(21,4),(21,12),(21,52),(21,69),(21,72),(21,73);
+-- user 22 Henrique: 10
+INSERT INTO usuario_interesse (usint_usuar_id, usint_subinter_id) VALUES
+(22,26),(22,27),(22,30),(22,33),(22,36),(22,37),(22,40),(22,41),(22,43),(22,48);
+-- user 23 Filipa: 5
+INSERT INTO usuario_interesse (usint_usuar_id, usint_subinter_id) VALUES
+(23,1),(23,3),(23,7),(23,16),(23,17);
+-- user 24 Vasco: 7
+INSERT INTO usuario_interesse (usint_usuar_id, usint_subinter_id) VALUES
+(24,5),(24,11),(24,13),(24,15),(24,22),(24,25),(24,58);
+-- user 25 Benedita: 4
+INSERT INTO usuario_interesse (usint_usuar_id, usint_subinter_id) VALUES
+(25,52),(25,54),(25,60),(25,75);
+-- user 26 Lourenço: 9
+INSERT INTO usuario_interesse (usint_usuar_id, usint_subinter_id) VALUES
+(26,19),(26,20),(26,21),(26,26),(26,32),(26,33),(26,34),(26,44),(26,57);
+-- user 27 Vitória: 6
+INSERT INTO usuario_interesse (usint_usuar_id, usint_subinter_id) VALUES
+(27,4),(27,7),(27,12),(27,17),(27,53),(27,74);
+-- user 28 Simão (banido): 5
+INSERT INTO usuario_interesse (usint_usuar_id, usint_subinter_id) VALUES
+(28,29),(28,35),(28,36),(28,46),(28,47);
+-- user 29 Núria: 3 (low interests)
+INSERT INTO usuario_interesse (usint_usuar_id, usint_subinter_id) VALUES
+(29,14),(29,63),(29,25);
+-- user 30 Tomé: 7
+INSERT INTO usuario_interesse (usint_usuar_id, usint_subinter_id) VALUES
+(30,1),(30,2),(30,26),(30,33),(30,51),(30,55),(30,68);
+
+-- ── CONEXÕES ────────────────────────────────────────────────────
+INSERT INTO pedido_conexao (pedcon_id, pedcon_usuar_remetente_id, pedcon_usuar_destinatario_id, pedcon_estado) VALUES
+(1,  1,  2,  'aceite'),
+(2,  1,  3,  'aceite'),
+(3,  1,  4,  'aceite'),
+(4,  1,  6,  'aceite'),
+(5,  2,  4,  'aceite'),
+(6,  2,  6,  'aceite'),
+(7,  2,  11, 'aceite'),
+(8,  2,  12, 'aceite'),
+(9,  3,  5,  'aceite'),
+(10, 3,  11, 'aceite'),
+(11, 3,  15, 'aceite'),
+(12, 3,  21, 'aceite'),
+(13, 4,  10, 'aceite'),
+(14, 4,  16, 'aceite'),
+(15, 4,  26, 'aceite'),
+(16, 5,  7,  'aceite'),
+(17, 5,  13, 'aceite'),
+(18, 5,  17, 'aceite'),
+(19, 5,  27, 'aceite'),
+(20, 6,  14, 'aceite'),
+(21, 6,  18, 'aceite'),
+(22, 6,  20, 'aceite'),
+(23, 6,  24, 'aceite'),
+(24, 7,  13, 'aceite'),
+(25, 7,  17, 'aceite'),
+(26, 7,  27, 'aceite'),
+(27, 8,  12, 'aceite'),
+(28, 8,  22, 'aceite'),
+(29, 9,  19, 'aceite'),
+(30, 9,  29, 'aceite'),
+(31, 10, 16, 'aceite'),
+(32, 10, 26, 'aceite'),
+(33, 11, 15, 'aceite'),
+(34, 11, 23, 'aceite'),
+(35, 12, 22, 'aceite'),
+(36, 12, 14, 'aceite'),
+(37, 13, 17, 'aceite'),
+(38, 14, 20, 'aceite'),
+(39, 14, 24, 'aceite'),
+(40, 15, 25, 'aceite'),
+(41, 16, 26, 'aceite'),
+(42, 18, 30, 'aceite'),
+(43, 19, 29, 'aceite'),
+(44, 21, 25, 'aceite'),
+(45, 23, 27, 'aceite'),
+-- pendentes
+(46, 13, 1,  'pendente'),
+(47, 17, 2,  'pendente'),
+(48, 29, 6,  'pendente'),
+(49, 30, 11, 'pendente'),
+-- recusados
+(50, 28, 1,  'recusado'),
+(51, 9,  12, 'recusado');
+
+-- ── MENSAGENS DIRETAS (datas variadas) ──────────────────────────
+INSERT INTO post (post_connect_id, post_usuar_id, post_conteudo, post_data_envio) VALUES
+-- conexão 1 (Admin-Deuwer)
+(1, 1, 'Boas Deuwer, já jogaste Elden Ring?',           '2026-04-10 09:12:00'),
+(1, 2, 'Sim! Melhor jogo dos últimos anos sem dúvida.', '2026-04-10 09:15:00'),
+(1, 1, 'Concordo, o DLC então...',                      '2026-04-10 09:18:00'),
+-- conexão 2 (Admin-Beatriz)
+(2, 1, 'Viste a última temporada de Succession?',       '2026-04-15 14:00:00'),
+(2, 3, 'Sim!! Que final incrível. Chorei.',             '2026-04-15 14:05:00'),
+(2, 3, 'Roman foi o personagem do ano.',                '2026-04-15 14:06:00'),
+-- conexão 5 (Deuwer-Rui)
+(5, 2, 'Oi Rui! Ouves Arctic Monkeys?',                 '2026-04-20 20:00:00'),
+(5, 4, 'Claro! AM é a minha banda favorita.',           '2026-04-20 20:03:00'),
+(5, 2, 'Foste ao concerto em Madrid?',                  '2026-04-20 20:05:00'),
+(5, 4, 'Não consegui bilhetes... Foi bom?',             '2026-04-20 20:08:00'),
+(5, 2, 'Incrível, a melhor noite da minha vida.',       '2026-04-20 20:10:00'),
+-- conexão 6 (Deuwer-Miguel)
+(6, 2, 'Jogamos League hoje à noite?',                  '2026-05-01 18:00:00'),
+(6, 6, 'Sim! Que horas?',                               '2026-05-01 18:02:00'),
+(6, 2, 'Umas 21h?',                                     '2026-05-01 18:04:00'),
+(6, 6, 'Perfeito.',                                     '2026-05-01 18:05:00'),
+-- conexão 9 (Beatriz-Ana)
+(9, 3, 'Ana, já viste The Bear?',                       '2026-05-05 11:00:00'),
+(9, 5, 'Não, mas toda a gente fala nisso!',             '2026-05-05 11:05:00'),
+(9, 3, 'Vê já! A melhor série do momento.',             '2026-05-05 11:07:00'),
+-- conexão 16 (Ana-Sofia)
+(16, 5, 'Sofia, curtes Billie Eilish?',                 '2026-05-08 15:30:00'),
+(16, 7, 'Obsessão total! Já foste a algum concerto?',   '2026-05-08 15:33:00'),
+(16, 5, 'Ainda não, queria muito ir!',                  '2026-05-08 15:35:00'),
+-- conexão 20 (Miguel-Francisco)
+(20, 6, 'Viste Oppenheimer?',                           '2026-05-10 21:00:00'),
+(20, 14,'Sim, 3 horas que passaram a voar.',            '2026-05-10 21:05:00'),
+(20, 6, 'Nolan é um génio.',                            '2026-05-10 21:07:00'),
+-- conexão 7 (Deuwer-Mariana)
+(7, 2, 'Mariana! Também curtes Succession?',            '2026-05-12 10:00:00'),
+(7, 11,'Sim!! És Team Logan ou Team Kendall?',          '2026-05-12 10:05:00'),
+(7, 2, 'Logan forever. Sem discussão.',                 '2026-05-12 10:08:00'),
+(7, 11,'Concordo hahaha.',                              '2026-05-12 10:09:00'),
+-- recentes (últimos 14 dias para o gráfico de atividade)
+(5, 2, 'Novo álbum de AM anunciado!!',                  '2026-05-14 08:00:00'),
+(5, 4, 'Já vi! Não posso esperar.',                     '2026-05-14 08:10:00'),
+(6, 6, 'Subimos de rank ontem!',                        '2026-05-15 22:00:00'),
+(6, 2, 'Finalmente Platinum!',                          '2026-05-15 22:05:00'),
+(1, 2, 'Patch novo do Elden Ring saiu.',                '2026-05-16 12:00:00'),
+(1, 1, 'Já instalei, que melhorias!',                   '2026-05-16 12:10:00'),
+(9, 3, 'Temporada 3 de The Bear confirmada!',           '2026-05-17 09:00:00'),
+(9, 5, 'Que notícia boa!!',                             '2026-05-17 09:05:00'),
+(9, 3, 'Já comecei a contar os dias.',                  '2026-05-17 09:06:00'),
+(16,7, 'Novo single de Billie disponível!',             '2026-05-18 14:00:00'),
+(16,5, 'Ouvi 10 vezes seguidas.',                       '2026-05-18 14:30:00'),
+(7, 11,'Mariana, viste Severance S2?',                  '2026-05-19 19:00:00'),
+(7, 2, 'Estou no ep 5, não faças spoiler!',             '2026-05-19 19:05:00'),
+(20,14,'Dune 2 foi ainda melhor que o primeiro.',       '2026-05-20 20:00:00'),
+(20,6, 'Denis Villeneuve é o Nolan da nova geração.',   '2026-05-20 20:10:00'),
+(35,12,'Partida de LoL hoje?',                          '2026-05-21 17:00:00'),
+(35,22,'Sim! Convida o João também.',                   '2026-05-21 17:05:00'),
+(22,12,'Elden Ring ou Baldur''s Gate 3?',               '2026-05-22 11:00:00'),
+(22,8, 'Elden Ring para combat, BG3 para história.',    '2026-05-22 11:10:00'),
+(22,12,'Concordo 100%.',                                '2026-05-22 11:12:00');
+
+-- ── EVENTOS ─────────────────────────────────────────────────────
+INSERT INTO evento (evento_id, evento_usuar_id, evento_titulo, evento_descricao, evento_local, evento_lat, evento_lng, evento_data) VALUES
+(1, 1,  'Concerto Arctic Monkeys',     'AM em Lisboa!',              'Altice Arena, Lisboa',          '38.7681', '-9.0952', '2026-06-14 21:00:00'),
+(2, 2,  'Maratona de Cinema Nolan',    'Dark Knight + Inception',    'Cinema NOS Colombo, Lisboa',    '38.7374', '-9.2313', '2026-06-20 18:00:00'),
+(3, 5,  'Torneio de Jogos Online',     'LoL + Valorant',             'Online',                        NULL,       NULL,      '2026-06-28 20:00:00'),
+(4, 11, 'Concerto Radiohead',          'Uma noite com Thom Yorke',   'Super Bock Arena, Porto',       '41.1533', '-8.6320', '2026-07-05 20:00:00'),
+(5, 1,  'Campeonato no IADE',          'Torneio FIFA entre alunos',  'IADE, Lisboa',                  '38.7167', '-9.1459', '2026-05-30 14:00:00'),
+(6, 3,  'Grupo de Séries',             'Discussão: Succession S4',   'Café Central, Lisboa',          '38.7139', '-9.1394', '2026-06-10 19:00:00'),
+(7, 6,  'Noite de Jogos de Tabuleiro', 'Catan, Ticket to Ride...',   'Casa do Miguel, Lisboa',        '38.7250', '-9.1500', '2026-06-08 20:00:00'),
+(8, 16, 'Praia e Música ao Vivo',      'Sunset com boa música',      'Praia de Carcavelos',           '38.6787', '-9.3353', '2026-07-12 17:00:00'),
+(9, 4,  'Hiking em Sintra',            'Percurso Palácio da Pena',   'Sintra, Lisboa',                '38.7876', '-9.3904', '2026-06-22 09:00:00'),
+(10,22, 'LAN Party Elden Ring',        'Quem chega mais longe',      'Universidade Europeia, Lisboa', '38.7267', '-9.1505', '2026-06-18 15:00:00');
+
+-- ── CONVITES ────────────────────────────────────────────────────
+INSERT INTO invite (invite_evento_id, invite_usuar_id, invite_estado) VALUES
+-- evento 1 (Concerto AM)
+(1, 2, 'confirmado'), (1, 4, 'confirmado'), (1, 6, 'confirmado'), (1, 11, 'pendente'), (1, 23, 'recusado'),
+-- evento 2 (Maratona Cinema)
+(2, 1, 'confirmado'), (2, 6, 'confirmado'), (2, 14, 'confirmado'), (2, 18, 'pendente'),
+-- evento 3 (Torneio Online)
+(3, 7, 'confirmado'), (3, 8, 'confirmado'), (3, 12, 'confirmado'), (3, 22, 'confirmado'), (3, 13, 'pendente'), (3, 17, 'pendente'),
+-- evento 4 (Radiohead Porto)
+(4, 3, 'confirmado'), (4, 15, 'confirmado'), (4, 23, 'pendente'), (4, 27, 'recusado'),
+-- evento 5 (FIFA IADE)
+(5, 2, 'confirmado'), (5, 4, 'confirmado'), (5, 8, 'confirmado'), (5, 12, 'confirmado'), (5, 22, 'confirmado'),
+-- evento 6 (Grupo Séries)
+(6, 5, 'confirmado'), (6, 11, 'confirmado'), (6, 15, 'confirmado'), (6, 21, 'confirmado'), (6, 25, 'pendente'),
+-- evento 7 (Jogos Tabuleiro)
+(7, 2, 'confirmado'), (7, 4, 'confirmado'), (7, 18, 'confirmado'),
+-- evento 8 (Praia)
+(8, 4, 'confirmado'), (8, 10, 'confirmado'), (8, 26, 'confirmado'), (8, 30, 'pendente'),
+-- evento 9 (Hiking)
+(9, 1, 'confirmado'), (9, 10, 'confirmado'), (9, 16, 'confirmado'), (9, 26, 'confirmado'), (9, 9, 'recusado'),
+-- evento 10 (LAN Party)
+(10, 2, 'confirmado'), (10, 8, 'confirmado'), (10, 12, 'confirmado'), (10, 26, 'confirmado'), (10, 4, 'pendente'), (10, 16, 'pendente');
+
+-- ── CHAT DE GRUPO ───────────────────────────────────────────────
+INSERT INTO group_post (gp_evento_id, gp_usuar_id, gp_conteudo, gp_data_envio) VALUES
+(1, 1,  'Alguém precisa de transporte para o concerto?',          '2026-05-20 10:00:00'),
+(1, 2,  'Eu venho de metro, há lugar para mais 2.',               '2026-05-20 10:05:00'),
+(1, 4,  'Posso ir contigo Deuwer!',                               '2026-05-20 10:10:00'),
+(1, 6,  'Eu arranjei boleia de carro, somos 4.',                  '2026-05-20 10:15:00'),
+(5, 1,  'Torneio começa às 14h em ponto, não se atrasem.',        '2026-05-21 09:00:00'),
+(5, 2,  'Confirmado, estou pronto para ganhar!',                  '2026-05-21 09:05:00'),
+(5, 4,  'Hahaha já veremos isso.',                                '2026-05-21 09:08:00'),
+(5, 8,  'Alguém sabe se há snacks?',                              '2026-05-21 09:10:00'),
+(5, 1,  'Sim, trago pizzas.',                                     '2026-05-21 09:12:00'),
+(3, 5,  'Que horas vos dá jeito começar o torneio?',              '2026-05-19 18:00:00'),
+(3, 7,  'As 20h perfeito para mim.',                              '2026-05-19 18:05:00'),
+(3, 12, 'Idem, às 20h.',                                          '2026-05-19 18:07:00'),
+(3, 22, 'Confirmed.',                                             '2026-05-19 18:10:00');
+
+-- ── REPORTS ─────────────────────────────────────────────────────
+INSERT INTO user_report (report_reporter_id, report_reported_id, report_reason, report_status, report_created_at) VALUES
+(9,  28, 'Comportamento agressivo nas mensagens', 'pending',   '2026-05-10 11:00:00'),
+(14, 28, 'Spam repetido no chat de grupo',        'pending',   '2026-05-12 14:00:00'),
+(20, 28, 'Linguagem ofensiva',                    'reviewed',  '2026-05-08 09:00:00'),
+(7,  9,  'Enviou mensagens inapropriadas',        'dismissed', '2026-04-28 16:00:00'),
+(3,  28, 'Perfil falso suspeito',                 'pending',   '2026-05-14 10:00:00');
